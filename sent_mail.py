@@ -14,7 +14,7 @@ def send_mail(msg_to_send, subject):
 
     # setup the parameters of the message
     # password = "cenace.123"
-    recipients = ["cdhierro@cenace.org.ec"]
+    recipients = ["cdhierro@cenace.org.ec","dpanchi@cenace.org.ec","rsanchez@cenace.org.ec"]
     msg['From'] = "sistemaremoto@cenace.org.ec"
     msg['To'] = ", ".join(recipients)
     msg['Subject'] = subject
