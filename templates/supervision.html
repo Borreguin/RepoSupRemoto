@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html><head>
+  <style>
+	#tbl_remoto {
+	  border-collapse: collapse;
+	  width: 100%;
+	}
+
+	#tbl_remoto td, #tbl_remoto th {
+	  border: 1px solid black;
+	  padding: 4px;
+	}
+
+	#tbl_remoto tr:nth-child(even){background-color: #f2f2f2;}
+
+	#tbl_remoto tr:hover {background-color: #c3d5d5;}
+
+	#tbl_remoto th {
+	  padding-top: 5px;
+	  padding-bottom: 5px;
+	  text-align: left;
+	  background-color: #d1e0e0;
+	  color: black;
+	}
+	
+	#prioridad_1{
+		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0)
+	}
+	#prioridad_2{
+		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0)
+	}
+	#prioridad_3{
+		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102)
+	}
+
+  .meter {
+	height: 18px;  /* Can be anything */
+	position: relative;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	padding: 1px;
+  }
+
+  .meter > span {
+    display: block;
+    height: 100%;
+    float: left;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: rgb(43,194,83);
+    box-shadow:
+      inset 0 2px 9px  rgba(255,255,255,0.3),
+      inset 0 -2px 6px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+</style>
+  <meta charset="utf-8">
+  <title>REPORTE DE SUPERVISIÓN</title>
+  	
+</head><body>
+<p style="text-align: left;"><img style="width: 100px; height: 50px;" alt="Logo CENACE" src="cid:image1" align="middle">
+<p> <font size="+1"><strong><span >
+<span style="text-decoration: underline;">REPORTE DE SUPERVISIÓN</span></span></strong></font>
+</p>
+
+<p>Fecha: (#dd/mm/yyyy)</p>
+
+<hr><strong>REPORTE INSTANTANEO</strong>
+
+<hr><u>UTRs INDISPONIBLES AL MOMENTO</u>
+<p>De un total de (#no_UTR) UTRs, se encuentran (#no_UTR_indisponible)
+indisponibles</p>
+
+<p>Las UTRs indisponibles al momento son:</p>
+
+<table border="1" width="736" id="tbl_remoto">
+
+  <tbody>
+    <tr>
+      <th scope="col" width="350">UTR</th>
+      <th scope="col" width="350">PROTOCOLO</th>
+      <th scope="col" width="350">ESTADO</th>
+    </tr>
+<!--Inicio: UTR_STATE-->
+  </tbody>
+</table>
+
+<br>
+<br>
+<hr><strong>REPORTE DEL ÚLTIMO DÍA</strong>
+<hr style="width: 100%;"><u>UTRs CON INDICE DE
+DISPONIBILIDAD MENOR AL 99.5% </u>
+
+<p><span style="font-weight: normal;">PERIODO: Desde (#ayer)
+hasta (#hoy)</span><u> </u></p>
+
+<table id="tbl_remoto">
+
+  <tbody>
+    <tr>
+      
+      <th style="width: 25px;" scope="col" > </th>
+      <th style="width: 219px;" scope="col">UTR</th>
+      <th scope="col" width="350">PROTOCOLO</th>
+	  <th scope="col" width="350">TIEMPO INDISPONIBLE</th>
+      <th scope="col" width="350">% DISPONIBILIDAD</th>
+    </tr>
+<!--
+    <tr>
+      <td id="prioridad_1"> <br>
+      </td>
+      <td style="vertical-align: top; width: 219px;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">
+        <div class="meter">
+          <span style="width: 20%"></span>
+          <div style="float: right;">20</div>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td id="prioridad_2"> <br>
+      </td>
+      <td style="vertical-align: top; width: 219px;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      
+      <td id="prioridad_3"> <br>
+      </td>
+      <td style="vertical-align: top; width: 219px;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    -->
+<!--Inicio: UTR_INDISPONIBLE-->
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+<hr style="width: 100%">
+<p>&nbsp;Atentamente,</p>
+
+<p>Sistema Remoto</p>
+
+</body></html>

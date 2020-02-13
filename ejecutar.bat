@@ -1,0 +1,1 @@
+cd C:\D_aplicaciones\rep_s_remoto & C: & C:\ProgramData\Anaconda3\Scripts\activate.bat & C:\ProgramData\Anaconda3\python.exe "C:\D_aplicaciones\rep_s_remoto\main.py"
