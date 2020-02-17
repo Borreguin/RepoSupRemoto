@@ -64,6 +64,7 @@ def process_excel_file(time_range, span=pi_svr.span("1d"), time_unit="di"):
     # df = df.set_index(lb_name)
     # df = df_filter.set_index(lb_name)
     # df = df_filter.set_index(lb_name)
+    df_filter.sort_values(by=[lb_prioridad,  lb_per_dispo], inplace=True)
     return  df, df_filter, df_indisp
 
 
@@ -141,8 +142,13 @@ def bar(percentage):
 def run_process_for_yesteday():
     time_range = define_time_range_for_yesterday()
     df, df_filter, df_indisp = process_excel_file(time_range)
+    recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
+    # recipients = ["rsanchez@cenace.org.ec"]
+    from_email = "sistemaremoto@cenace.org.ec"
+    image_list = ["cenace.jpg"]
     str_html = process_html_file(df, df_filter, df_indisp)
-    send.send_mail(str_html, "Supervision Sistema Remoto")
+    send.send_mail(str_html, "Supervisión Sistema Remoto " + dt.datetime.now().strftime("%d/%m/%Y"),
+                   recipients, from_email, image_list)
 
 
 if __name__ == "__main__":

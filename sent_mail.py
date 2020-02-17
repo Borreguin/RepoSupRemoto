@@ -1,40 +1,53 @@
 from email.mime.image import MIMEImage
+import os
 
+im_path = "templates/"
 
-def send_mail(msg_to_send, subject):
+def send_mail(msg_to_send:str, subject, recipients, from_email, image_list: list = None):
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     import smtplib
+
+    im_to_append = list()
+    # configure images if is needed
+    if image_list is not None and isinstance(image_list, list):
+        # This assumes the images are in "templates" folder
+        for ix, image in enumerate(image_list):
+            if os.path.exists(im_path + image):
+                # redefine src= in html file (cid:image1)
+                msg_to_send = msg_to_send.replace(image, f"cid:image{ix}")
+                im_to_append.append(image)
+
     # configuraciones generales:
     SERVER = "mail.cenace.org.ec"
-
 
     # create message object instance
     msg = MIMEMultipart('related')
 
     # setup the parameters of the message
     # password = "cenace.123"
-    recipients = ["cdhierro@cenace.org.ec","dpanchi@cenace.org.ec","rsanchez@cenace.org.ec"]
-    msg['From'] = "sistemaremoto@cenace.org.ec"
+    # recipients = ["mbautista@cenace.org.ec","ems@cenace.org.ec"]
+    msg['From'] = from_email
     msg['To'] = ", ".join(recipients)
     msg['Subject'] = subject
     msg.preamble = """"""
 
-
+    # add in the message body as HTML content
     HTML_BODY = MIMEText(msg_to_send, 'html')
     msg.attach(HTML_BODY)
 
-    # add in the message body
-    # msg.attach(MIMEText(message, 'plain'))
+    # adding messages to the mail (only the ones that where found)
+    for ix, image in enumerate(im_to_append):
+        try:
+            fp = open(im_path + image, 'rb')
+            msgImage = MIMEImage(fp.read())
+            fp.close()
+            # Define the image's ID as referenced above
+            msgImage.add_header('Content-ID', f'<image{ix}>')
+            msg.attach(msgImage)
+        except:
+            pass
 
-    # This example assumes the image is in templates
-    fp = open('templates/cenace.jpg', 'rb')
-    msgImage = MIMEImage(fp.read())
-    fp.close()
-
-    # Define the image's ID as referenced above
-    msgImage.add_header('Content-ID', '<image1>')
-    msg.attach(msgImage)
 
     # create server
     server = smtplib.SMTP(SERVER)
