@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <style>
+	#tbl_remoto {
+	  border-collapse: collapse;
+	  width: 100%;
+	}
+
+	#tbl_remoto td, #tbl_remoto th {
+	  border: 1px solid black;
+	  padding: 4px;
+	}
+
+	#tbl_remoto tr:nth-child(even){background-color: #f2f2f2;}
+
+	#tbl_remoto tr:hover {background-color: #c3d5d5;}
+
+	#tbl_remoto th {
+	  padding-top: 5px;
+	  padding-bottom: 5px;
+	  text-align: left;
+	  background-color: #d1e0e0;
+	  color: black;
+	}
+	
+	#prioridad_1{
+		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0)
+	}
+	#prioridad_2{
+		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0)
+	}
+	#prioridad_3{
+		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102)
+	}
+
+  .meter {
+	height: 18px;  /* Can be anything */
+	position: relative;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	padding: 1px;
+  }
+
+  .meter > span {
+    display: block;
+    height: 100%;
+    float: left;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: rgb(43,194,83);
+    box-shadow:
+      inset 0 2px 9px  rgba(255,255,255,0.3),
+      inset 0 -2px 6px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  </style>
+  <meta charset="utf-8"><title>SUPERVISIÓN SISTEMA CENTRAL </title>
+</head>
+<body>
+<p style="text-align: left;"><img style="width: 100px; height: 50px;" alt="Logo CENACE" src="./images/cenace.jpg" align="middle">
+</p>
+
+<p> <font size="+1"><strong><span><span style="text-decoration: underline;">REPORTE DE SUPERVISIÓN (FO-GDT-STR-RNS REV. 01)</span></span></strong></font>
+</p>
+
+<p>Desde: (#ayer) Hasta: (#hoy) <br>
+</p>
+
+<hr><strong>ADQUISICIÓN DE DATOS</strong>
+<hr><u>UTRs INDISPONIBLES AL MOMENTO</u>
+<p>De un total de (#no_UTR) UTRs, se encuentran (#no_UTR_indisponible)
+indisponibles</p>
+
+<p>Las UTRs indisponibles al momento son:</p>
+
+<table border="1"  id="tbl_remoto" >
+
+  <tbody>
+    <tr>
+        <th style="vertical-align: top; width: 2px"><br></th>
+        <th scope="col" width="350">UTR</th>
+        <th scope="col" width="350">PROTOCOLO</th>
+        <th scope="col" width="350">ESTADO</th>
+    </tr>
+    <!--Inicio: UTR_STATE-->
+  </tbody>
+</table>
+
+<br>
+
+<u>ENLACES ICCP INDISPONIBLES AL MOMENTO</u>
+<p>De un total de (#no_ICCP) enlaces, se encuentran
+(#no_ICCP_indisponible)
+indisponibles</p>
+
+<!-- INI:ICCP-->
+<p>Los enlaces ICCP indisponibles al momento son:</p>
+<table id="tbl_remoto" border="1">
+  <tbody>
+    <tr>
+        <th style="vertical-align: top; width: 2px"><br></th>
+        <th scope="col" width="300">ICCP<br></th>
+        <th scope="col" width="350">ESTADO<br></th>
+        <th scope="col" width="350">% DISPONIBILIDAD<br></th>
+        <th scope="col" width="350">OBSERVACIONES<br>
+      </th>
+    </tr>
+<!--Inicio: ICCP_STATE-->
+  </tbody>
+</table>
+<!-- END:ICCP-->
+
+
+<br>
+<hr><strong>OPERACIÓN DEL AGC</strong>
+<hr> <br>
+
+<table id="tbl_remoto" border="1">
+
+  <tbody>
+    <tr>
+      <th scope="col" width="350">CENTRAL<br></th>
+      <th scope="col" width="350">MODO DE OPERACIÓN<br></th>
+      <th scope="col" width="350">ESTADO<br></th>
+    </tr>
+<!--Inicio: AGC_STATE-->
+  </tbody>
+</table>
+
+<br>
+<hr><strong>SISTEMA CENTRAL</strong>
+<hr> <br>
+
+<table  id="tbl_remoto" border="1">
+    <tbody>
+    <tr>
+        <th style="vertical-align: top; width: 2px"><br></th>
+        <th scope="col" style="width: 350px;">SERVIDOR</th>
+        <th scope="col" width="350">ONLINE<br></th>
+        <th scope="col" width="350">ESTADO<br></th>
+        <th scope="col" width="350">STANDBY<br></th>
+        <th scope="col" width="350">ESTADO<br></th>
+        <th scope="col" width="350">OBSERVACIONES<br></th>
+    </tr>
+<!--Inicio: CENTRAL_STATE-->
+  </tbody>
+</table><br>
+
+
+<hr><strong>ERRRORES CRÍTICOS DE LOS SERVIDORES</strong>
+<hr><br>
+<br>
+Atentamente,
+
+<p>Programas SCADA<br>
+</p>
+
+</body>
+</html>

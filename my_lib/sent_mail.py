@@ -1,7 +1,9 @@
 from email.mime.image import MIMEImage
 import os
 
-im_path = "templates/"
+script_path = os.path.dirname(os.path.abspath(__file__))
+im_path = script_path.replace("my_lib", "reportes")
+
 
 def send_mail(msg_to_send:str, subject, recipients, from_email, image_list: list = None):
     from email.mime.multipart import MIMEMultipart
@@ -13,10 +15,17 @@ def send_mail(msg_to_send:str, subject, recipients, from_email, image_list: list
     if image_list is not None and isinstance(image_list, list):
         # This assumes the images are in "templates" folder
         for ix, image in enumerate(image_list):
-            if os.path.exists(im_path + image):
+            if "/" in image:
+                image_l = image.replace("./", "")
+                image_l = image_l.split("/")
+                to_check = os.path.join(im_path, *image_l)
+            else:
+                to_check = os.path.join(im_path, image)
+
+            if os.path.exists(to_check):
                 # redefine src= in html file (cid:image1)
                 msg_to_send = msg_to_send.replace(image, f"cid:image{ix}")
-                im_to_append.append(image)
+                im_to_append.append(to_check)
 
     # configuraciones generales:
     SERVER = "mail.cenace.org.ec"
@@ -39,7 +48,7 @@ def send_mail(msg_to_send:str, subject, recipients, from_email, image_list: list
     # adding messages to the mail (only the ones that where found)
     for ix, image in enumerate(im_to_append):
         try:
-            fp = open(im_path + image, 'rb')
+            fp = open(os.path.join(im_path, image), 'rb')
             msgImage = MIMEImage(fp.read())
             fp.close()
             # Define the image's ID as referenced above
