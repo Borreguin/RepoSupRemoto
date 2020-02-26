@@ -49,7 +49,7 @@ fmt_dd_mm_yy_ = u.fmt_dd_mm_yy_
 time_range = None
 
 
-def process_html_file(df, df_filter, df_indisp):
+def process_html_file(df, df_filter, df_indisp, df_hist=None):
     global reporte_path
     global time_range
     # realizando las sustituciones necesarias para llenar el formulario HTML:
@@ -61,6 +61,7 @@ def process_html_file(df, df_filter, df_indisp):
     html_str = html_str.replace("(#ayer)", time_range.StartTime.ToString(fmt_dd_mm_yyyy_hh_mm))
     html_str = html_str.replace("(#hoy)", time_range.EndTime.ToString(fmt_dd_mm_yyyy_hh_mm))
 
+    # llenando la tabla de REPORTE INSTANTANEO
     state_str = str()
     for ix in df_indisp.index:
         prioridad = df_indisp[lb_prioridad].loc[ix]
@@ -69,6 +70,7 @@ def process_html_file(df, df_filter, df_indisp):
         protocol = df_indisp[lb_protocol].loc[ix]
         state_str += populate_state_table(prioridad, name, protocol, state)
 
+    # llenando la tabla de REPORTE DEL ÚLTIMO DÍA
     per_str = str()
     df_filter["minutes"] = (1-df_filter[lb_per_dispo]/100)*24*60
     for ix in df_filter.index:
@@ -84,10 +86,43 @@ def process_html_file(df, df_filter, df_indisp):
             minutes = "00 h {:02d} m".format(int(minutes))
         per_str += populate_disp_percentage(prioridad, name, protocol, minutes, percentage)
 
+    str_semanal = str()
+    if df_hist is not None and not df_hist.empty:
+        df_hist[lb_per_dispo] = [round(x/7, 2) for x in df_hist[lb_per_dispo]]
+        filter_exp = df_hist[u.lb_filter].iloc[0]
+        mask = (df_hist[lb_state] == f"{filter_exp}") & (df_hist[lb_per_dispo] < 99.5)
+        df_hist = df_hist[mask].copy()
+        period = df_hist[lb_period].iloc[0]
+        html_str = html_str.replace("(#periodo_semanal)", period)
+
+        for ix in df_hist.index:
+            name = df_hist[lb_name].loc[ix]
+            tag_name = df_hist[lb_tag].loc[ix]
+            protocol = df_hist[lb_protocol].loc[ix]
+            prioridad = df_hist[lb_prioridad].loc[ix]
+            percentage = df_hist[lb_per_dispo].loc[ix]
+            pt = p.PI_point(pi_svr, tag_name)
+            str_week_time = str(df_hist[lb_period].loc[ix]).split("-")
+            week_time_range = pi_svr.time_range(str_week_time[0], str_week_time[1])
+            df_h = pt.interpolated(week_time_range, span=pi_svr.span("1h"), numeric=False)
+            # creando las barras de estados:
+            im_name = "rep_utr_" + name
+            image_p = os.path.join(images_path, im_name + ".png")
+            image_p_relative = "./images/" + im_name + ".png"
+            u.generate_bar_estatus(series=df_h[tag_name], fig_size=(15, 1), path_to_save=image_p)
+            str_semanal += populate_with_bars(prioridad, name, protocol, percentage, image_p_relative)
+
     html_str = html_str.replace("<!--Inicio: UTR_STATE-->", state_str)
     html_str = html_str.replace("<!--Inicio: UTR_INDISPONIBLE-->", per_str)
-
+    html_str = html_str.replace("<!--Inicio: UTR_SEMANAL-->", str_semanal)
     return html_str
+
+
+def populate_with_bars(prioridad, name, protocol, percentage,image_scr):
+    return f"<tr> <td id=\"prioridad_{prioridad}\"></td>  <td>{name}</td> " \
+           f"<td>{protocol}</td> <td>{percentage}</td> " \
+           f"\t <td><div><img alt=\"{image_scr}\" src=\"{image_scr}\"> </div> \n" \
+                  f"</td></tr> \n"
 
 
 def populate_state_table(prioridad, name, protocol, state):
@@ -109,16 +144,27 @@ def bar(percentage):
 def run_process_for(time_range_to_run):
     global time_range
     global reporte_path
+    # definiendo tiempo del reporte:
     time_range = time_range_to_run
+
+    # definiendo tiempo del reporte una semana atrás:
+    week_time_range = u.define_time_range_for_last_week()
+
+    # definiendo configuraciones para mail:
+    recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
+    # recipients = ["rsanchez@cenace.org.ec"]
+    from_email = "sistemaremoto@cenace.org.ec"
+
     # calculando estado de UTRs:
     df, df_filter, df_indisp = u.process_excel_file(excel_file=excel_file, sheet_name=sRemotoSheet,
                                                     time_range_to_run=time_range_to_run)
-    # recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
-    recipients = ["rsanchez@cenace.org.ec"]
-    from_email = "sistemaremoto@cenace.org.ec"
+
+    # procesando información de una semana:
+    df_hist, _, _ = u.process_excel_file(excel_file=excel_file, sheet_name=sRemotoSheet,
+                                                    time_range_to_run=week_time_range,  span=pi_svr.span("7d"))
 
     # llenando el template con datos
-    str_html = process_html_file(df, df_filter, df_indisp)
+    str_html = process_html_file(df, df_filter, df_indisp, df_hist)
 
     # guardando el reporte en la carpeta reportes
     reporte_path = os.path.join(reporte_path, f"sistema_remoto_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")

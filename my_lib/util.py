@@ -36,6 +36,13 @@ def define_time_range_for_yesterday():
     return time_range
 
 
+def define_time_range_for_last_week():
+    tdy = dt.datetime.now().strftime(yyyy_mm_dd_hh_mm_ss)
+    wkt = dt.datetime.now() - dt.timedelta(days=7)
+    time_range = pi_svr.time_range(wkt, tdy)
+    return time_range
+
+
 def process_excel_file(excel_file, sheet_name, time_range_to_run,
                        span=pi_svr.span("1d"), time_unit="di"):
 
@@ -116,11 +123,52 @@ def save_html(html_str, path_html_to_save):
         print(e)
 
 
-def generate_bar_estatus(series: pd.Series, fig_size, path_to_save: str = None):
-    from matplotlib.patches import Patch
-    plt.rcParams.update({'font.size': 22})
+def get_state_colors(excel_path:str, sheet_name:str):
+    columns = ["ESTADO", "COLOR"]
+    try:
+        df = pd.read_excel(excel_path, sheet_name)
+        df = df[columns]
+        color_dict = dict()
+        for ste, sus in zip(list(df["ESTADO"]), list(df["COLOR"])):
+            color_dict[ste] = sus
+        return True, color_dict
+    except Exception as e:
+        print(e)
+        return False, dict()
+
+
+def get_state_translation(excel_path:str, sheet_name:str):
+    columns = ["ESTADO", "SUSTITUCION"]
+    try:
+        df = pd.read_excel(excel_path, sheet_name)
+        df = df[columns]
+        state_dict = dict()
+        for ste, clr in zip(list(df["ESTADO"]), list(df["SUSTITUCION"])):
+            state_dict[ste] = clr
+        return True, state_dict
+    except Exception as e:
+        print(e)
+        return False, dict()
+
+
+def get_translation(series: pd.Series, excel_path:str, sheet_name: str):
+    success, dict_t = get_state_translation(excel_path, sheet_name)
+    if not success:
+        return series
     states = list(set(series))
-    states.sort()
+    for st in states:
+        if not st in dict_t.keys():
+            continue
+        replace = dict_t[st]
+        series.replace(to_replace=st, value=replace, inplace=True)
+    return series
+
+
+def generate_bar_estatus(series: pd.Series, fig_size, path_to_save: str = None, color_map: dict = None):
+    from matplotlib.patches import Patch
+    plt.rcParams.update({'font.size': 24})
+    states = list(set(series))
+    # states.sort()
     ti_i = series.index[0]  # tiempo inicial del estado
     st_i = series[0]        # estado inicial
     data = list()
@@ -131,23 +179,27 @@ def generate_bar_estatus(series: pd.Series, fig_size, path_to_save: str = None):
             ti_i = t
     data.append((ti_i, series.index[-1], st_i))
     cats = dict()
-    colormapping = dict()
+    color_mapping = dict()
     legend_elements = list()
     for ix, st in enumerate(states):
         cats[st] = 0
-        colormapping[st] = f"C{ix}"
-        legend_elements.append(Patch(facecolor=f'C{ix}', label=st))
+        if color_map is not None and st in color_map.keys():
+            color_mapping[st] = color_map[st]
+        else:
+            color_mapping[st] = f"C{ix}"
+
+        legend_elements.append(Patch(facecolor=color_mapping[st], label=st))
 
     verts = []
     colors = []
     for d in data:
-        v = [(mdates.date2num(d[0]), cats[d[2]] - .1),
-             (mdates.date2num(d[0]), cats[d[2]] + .1),
-             (mdates.date2num(d[1]), cats[d[2]] + .1),
-             (mdates.date2num(d[1]), cats[d[2]] - .1),
-             (mdates.date2num(d[0]), cats[d[2]] - .1)]
+        v = [(mdates.date2num(d[0]), cats[d[2]] - .05),
+             (mdates.date2num(d[0]), cats[d[2]] + .05),
+             (mdates.date2num(d[1]), cats[d[2]] + .05),
+             (mdates.date2num(d[1]), cats[d[2]] - .05),
+             (mdates.date2num(d[0]), cats[d[2]] - .05)]
         verts.append(v)
-        colors.append(colormapping[d[2]])
+        colors.append(color_mapping[d[2]])
 
     bars = PolyCollection(verts, facecolors=colors)
 
@@ -178,12 +230,12 @@ def generate_bar_estatus(series: pd.Series, fig_size, path_to_save: str = None):
     ax.set_yticklabels([""])
 
     lgd = ax.legend(handles=legend_elements, loc="center left", bbox_to_anchor=(1, 0.5))
-    text = ax.text(-0.2, 1.05, "", transform=ax.transAxes)
+    text = ax.text(0, 0, "", transform=ax.transAxes)
     ax.autoscale()
     if path_to_save is not None:
         try:
             fig.savefig(path_to_save, bbox_extra_artists=(lgd, text), bbox_inches='tight',
-                        format="png", transparent=True, dpi=55)
+                        format="png", transparent=True, dpi=30)
             return True, fig
         except Exception as e:
             print(e)

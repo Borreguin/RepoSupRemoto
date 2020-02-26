@@ -1,9 +1,12 @@
 """
 Este script ejecuta la supervisión de sistema remoto, basada en las configuraciones del archivo:
     "Config.xlsx (excel_file)", hoja:
+con los campos:
+    Activa	Prioridad	EMPRESA	Nombre	Tag	Expresion	Tiempo	Porcentaje_Disp	Protocolo
 
-
-
+El script envía un mail a la lista: recipients
+con el usuario: from_email = "sistemaremoto@cenace.org.ec"
+anexando las imágenes definidas en: image_list
 
 """
 
@@ -28,19 +31,23 @@ html_central_file = os.path.join(script_path, "templates", "supervision_prg_SCAD
 images_path = os.path.join(reporte_path, "images")
 IccpSheet = "ICCP"
 AGCSheet = "AGC"
+TranslateSheet = "TRADUCCION"
+ColorSheet = "COLORES"
 
 time_range = None
 
 
-def process_html_iccp(df, df_indisp, html_str):
+def process_html_iccp(df, df_indisp, df_hist, html_str):
     global reporte_path
     # realizando las sustituciones necesarias para llenar el formulario HTML:
     html_str = html_str.replace("(#no_ICCP)", str(len(df.index)))
     html_str = html_str.replace("(#no_ICCP_indisponible)", str(len(df_indisp)))
     f_text = df[u.lb_filter].iloc[0]
     mask = (df[sRemoto.lb_per_dispo] < 99.5) | (df[sRemoto.lb_state] == str(f_text))
+    # mask = (df[sRemoto.lb_state] == str(f_text))
     df_to_process = df[mask]
     state_str = str()
+    # LLenando la tabla de enlaces ICCP indisponibles AL MOMENTO
     for ix in df_to_process.index:
         name = df_to_process[u.lb_name].loc[ix]
         state = df_to_process[u.lb_state].loc[ix]
@@ -53,6 +60,28 @@ def process_html_iccp(df, df_indisp, html_str):
     else:
         html_str = u.replace_block(from_label="<!-- INI:ICCP-->", to_label="<!-- END:ICCP-->",
                                    html_str=html_str, to_replace="")
+
+    # Llenando la tabla de enlaces ICCP de mayor importancia:
+    df = df[df[u.lb_prioridad] == 1]
+    str_tb = str()
+    for ix in df.index:
+        name = df[u.lb_name].loc[ix]
+        tag = df[u.lb_tag].loc[ix]
+        if tag not in df_hist.columns:
+            continue
+        df_hist[tag] = [str(x) for x in df_hist[tag]]
+        df_hist[tag] = u.get_translation(df_hist[tag], excel_path=excel_file, sheet_name=TranslateSheet)
+        im_name = "rep_iccp_" + name
+        image_p = os.path.join(images_path, im_name + ".png")
+        image_p_relative = "./images/" + im_name + ".png"
+        state = df_hist[tag].iloc[-1]
+        _, color_map = u.get_state_colors(excel_path=excel_file, sheet_name=ColorSheet)
+        u.generate_bar_estatus(series=df_hist[tag], fig_size=(15, 1), path_to_save=image_p, color_map=color_map)
+        str_tb += f"<tr> <td> {name}</td>  <td>{state}</td>  \n" \
+                  f"\t <td><div><img alt=\"{im_name}\" " \
+                  f"  src=\"{image_p_relative}\"> </div> \n" \
+                  f"</td></tr> \n"
+    html_str = html_str.replace("<!--Inicio: ICCP_BARRAS-->", str_tb)
     return html_str
 
 
@@ -80,13 +109,15 @@ def process_agc_html(html_str: str, df: pd.DataFrame, df_hist: pd.DataFrame):
         if tag not in df_hist.columns:
             continue
         df_hist[tag] = [str(x) for x in df_hist[tag]]
+        df_hist[tag] = u.get_translation(df_hist[tag], excel_path=excel_file, sheet_name=TranslateSheet)
         state = df_hist[tag].iloc[-1]
-        image_p = os.path.join(images_path, name + ".png")
-        image_p_relative = "./images/" + name + ".png"
-        u.generate_bar_estatus(series=df_hist[tag], fig_size=(12, 1), path_to_save=image_p)
+        im_name = "rep_agc_" + name
+        image_p = os.path.join(images_path, im_name + ".png")
+        image_p_relative = "./images/" + im_name + ".png"
+        u.generate_bar_estatus(series=df_hist[tag], fig_size=(15, 1), path_to_save=image_p)
 
         str_tb += f"<tr> <td> {name}</td>  <td> {state} </td> \n" \
-                  f"\t <td><div><img alt=\"{name}\" " \
+                  f"\t <td><div><img alt=\"{im_name}\" " \
                   f"  src=\"{image_p_relative}\"> </div> \n" \
                   f"</td></tr> \n"
 
@@ -98,7 +129,8 @@ def run_process_for(time_range_to_run):
     global time_range
     time_range = time_range_to_run
     # recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
-    recipients = ["rsanchez@cenace.org.ec"]
+    recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "cdhierro@cenace.org.ec", "dpanchi@cenace.org.ec"]
+    # recipients = ["rsanchez@cenace.org.ec"]
     from_email = "sistemacentral@cenace.org.ec"
     image_list = ["cenace.jpg", "./images/Molino AGC.png"]
     # procesando el archivo html con campos de sRemoto, ya que la tabla UTR es similar:
@@ -113,8 +145,11 @@ def run_process_for(time_range_to_run):
     # Estado de ICCP:
     df, df_filter, df_indisp = u.process_excel_file(excel_file=excel_file, sheet_name=IccpSheet,
                                                     time_range_to_run=time_range_to_run)
+
+    _, df_hist = u.get_history_from(excel_file=excel_file, sheet_name=IccpSheet, time_range=time_range)
+
     # procesando la información ICCP en el archivo ICCP:
-    str_html = process_html_iccp(df, df_indisp, str_html)
+    str_html = process_html_iccp(df, df_indisp, df_hist, str_html)
 
     # procesando Modo del AGC:
     df, df_hist = u.get_history_from(excel_file=excel_file, sheet_name=AGCSheet, time_range=time_range_to_run)
