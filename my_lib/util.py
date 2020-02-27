@@ -12,7 +12,7 @@ from my_lib import pi_connect as p
 yyyy_mm_dd_hh_mm_ss = "%d-%m-%Y %H:%M:%S"
 fmt_dd_mm_yyyy_hh_mm = "dd/MMM/yy HH:mm"
 fmt_dd_mm_yyyy = "dd/MMM/yyyy"
-fmt_dd_mm_yy_ = "dd_mmm_yyyy"
+fmt_dd_mm_yy_ = "dd_MMM_yyyy"
 pi_svr = p.PIserver()
 
 lb_tag = "Tag"

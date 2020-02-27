@@ -74,7 +74,7 @@ def process_html_iccp(df, df_indisp, df_hist, html_str):
             continue
         df_hist[tag] = [str(x) for x in df_hist[tag]]
         df_hist[tag] = u.get_translation(df_hist[tag], excel_path=excel_file, sheet_name=TranslateSheet)
-        im_name = "rep_iccp_" + name
+        im_name = "rep_iccp_" + name + "_" + time_range.EndTime.ToString(fmt_dd_mm_yy_)
         image_p = os.path.join(images_path, im_name + ".png")
         image_p_relative = "./images/" + im_name + ".png"
         state = df_hist[tag].iloc[-1]
