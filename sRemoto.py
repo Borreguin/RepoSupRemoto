@@ -25,20 +25,24 @@ import installer as ins
 
 """ Variables globales """
 pi_svr = p.PIserver()
+excel_file = "Config.xlsx"
+# etiquetas de la hoja Config
 lb_tag = "Tag"
 lb_name = "Nombre"
 lb_expression = "Expresion"
 lb_tiempo = "Tiempo"
 lb_per_dispo = "Porcentaje_Disp"
-excel_file = "Config.xlsx"
 lb_state = "Estado"
 lb_date = "Fecha"
 lb_period = "Periodo"
 lb_activa = "Activa"
 lb_protocol = "Protocolo"
 lb_prioridad = "Prioridad"
+# Hojas a utilizar del archivo excel
 sRemotoSheet = "sRemoto"
+ColorSheet = "COLORES"
 
+""" Configuraciones del script """
 script_path = os.path.dirname(os.path.abspath(__file__))
 html_remoto_file = os.path.join(script_path, "templates", "supervision_sist_remoto.html")
 reporte_path = os.path.join(script_path, "reportes")
@@ -105,11 +109,13 @@ def process_html_file(df, df_filter, df_indisp, df_hist=None):
             str_week_time = str(df_hist[lb_period].loc[ix]).split("-")
             week_time_range = pi_svr.time_range(str_week_time[0], str_week_time[1])
             df_h = pt.interpolated(week_time_range, span=pi_svr.span("1h"), numeric=False)
+            df_h[tag_name] = [str(x) for x in df_h[tag_name]]
             # creando las barras de estados:
-            im_name = "rep_utr_" + name
+            im_name = "rep_utr_" + name + "_" + time_range.EndTime.ToString(fmt_dd_mm_yy_)
             image_p = os.path.join(images_path, im_name + ".png")
             image_p_relative = "./images/" + im_name + ".png"
-            u.generate_bar_estatus(series=df_h[tag_name], fig_size=(15, 1), path_to_save=image_p)
+            _, color_map = u.get_state_colors(excel_path=excel_file, sheet_name=ColorSheet)
+            u.generate_bar_estatus(series=df_h[tag_name], fig_size=(15, 1), path_to_save=image_p, color_map=color_map)
             str_semanal += populate_with_bars(prioridad, name, protocol, percentage, image_p_relative)
 
     html_str = html_str.replace("<!--Inicio: UTR_STATE-->", state_str)

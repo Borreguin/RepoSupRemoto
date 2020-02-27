@@ -25,15 +25,18 @@ import re
 """ Variables globales """
 pi_svr = p.PIserver()
 excel_file = sRemoto.excel_file
-reporte_path = sRemoto.reporte_path
-script_path = os.path.dirname(os.path.abspath(__file__))
-html_central_file = os.path.join(script_path, "templates", "supervision_prg_SCADA.html")
-images_path = os.path.join(reporte_path, "images")
+# hojas a utilizar del archivo excel:
 IccpSheet = "ICCP"
 AGCSheet = "AGC"
 TranslateSheet = "TRADUCCION"
 ColorSheet = "COLORES"
 
+""" Configuraciones del script """
+reporte_path = sRemoto.reporte_path
+script_path = os.path.dirname(os.path.abspath(__file__))
+html_central_file = os.path.join(script_path, "templates", "supervision_prg_SCADA.html")
+images_path = os.path.join(reporte_path, "images")
+fmt_dd_mm_yy_ = u.fmt_dd_mm_yy_
 time_range = None
 
 
@@ -111,10 +114,11 @@ def process_agc_html(html_str: str, df: pd.DataFrame, df_hist: pd.DataFrame):
         df_hist[tag] = [str(x) for x in df_hist[tag]]
         df_hist[tag] = u.get_translation(df_hist[tag], excel_path=excel_file, sheet_name=TranslateSheet)
         state = df_hist[tag].iloc[-1]
-        im_name = "rep_agc_" + name
+        im_name = "rep_agc_" + name + "_" + time_range.EndTime.ToString(fmt_dd_mm_yy_)
         image_p = os.path.join(images_path, im_name + ".png")
         image_p_relative = "./images/" + im_name + ".png"
-        u.generate_bar_estatus(series=df_hist[tag], fig_size=(15, 1), path_to_save=image_p)
+        _, color_map = u.get_state_colors(excel_path=excel_file, sheet_name=ColorSheet)
+        u.generate_bar_estatus(series=df_hist[tag], fig_size=(15, 1), path_to_save=image_p, color_map=color_map)
 
         str_tb += f"<tr> <td> {name}</td>  <td> {state} </td> \n" \
                   f"\t <td><div><img alt=\"{im_name}\" " \
@@ -127,9 +131,10 @@ def process_agc_html(html_str: str, df: pd.DataFrame, df_hist: pd.DataFrame):
 
 def run_process_for(time_range_to_run):
     global time_range
+    global reporte_path
     time_range = time_range_to_run
-    # recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
-    recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "cdhierro@cenace.org.ec", "dpanchi@cenace.org.ec"]
+    recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
+    # recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "cdhierro@cenace.org.ec", "dpanchi@cenace.org.ec"]
     # recipients = ["rsanchez@cenace.org.ec"]
     from_email = "sistemacentral@cenace.org.ec"
     image_list = ["cenace.jpg", "./images/Molino AGC.png"]
@@ -162,6 +167,11 @@ def run_process_for(time_range_to_run):
     image_list = [im[0].replace('"', '') for im in image_list]
     send.send_mail(str_html, "Supervisión Sistema Central " + dt.datetime.now().strftime("%d/%m/%Y"),
                    recipients, from_email, image_list)
+
+    # guardando el reporte en la carpeta reportes
+    reporte_path = os.path.join(reporte_path,
+                                f"sistema_central_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")
+    u.save_html(str_html, reporte_path)
 
 
 if __name__ == "__main__":
