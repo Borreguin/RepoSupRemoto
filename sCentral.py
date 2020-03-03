@@ -170,8 +170,7 @@ def run_process_for(time_range_to_run):
     global reporte_path
     time_range = time_range_to_run
     recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
-    # recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "cdhierro@cenace.org.ec", "dpanchi@cenace.org.ec"]
-    recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "anarvaez@cenace.org.ec"]
+    # recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "anarvaez@cenace.org.ec"]
     from_email = "sistemacentral@cenace.org.ec"
     image_list = ["cenace.jpg", "./images/Molino AGC.png"]
     # procesando el archivo html con campos de sRemoto, ya que la tabla UTR es similar:
