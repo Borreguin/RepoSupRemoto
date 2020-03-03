@@ -164,6 +164,15 @@ def get_translation(series: pd.Series, excel_path:str, sheet_name: str):
     return series
 
 
+def read_excel(excel_file, sheet_name):
+    try:
+        df = pd.read_excel(excel_file, sheet_name=sheet_name)
+        return True, df, "Leído exitosamente"
+    except Exception as e:
+        print(e)
+        return False, pd.DataFrame(), "No se ha podido leer el archivo \n" + str(e)
+
+
 def generate_bar_estatus(series: pd.Series, fig_size, path_to_save: str = None, color_map: dict = None):
     from matplotlib.patches import Patch
     plt.rcParams.update({'font.size': 24})

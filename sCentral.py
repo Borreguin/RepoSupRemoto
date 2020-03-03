@@ -12,7 +12,6 @@ anexando las imágenes definidas en: image_list
 
 # Librería de conexión con Pi-Server, # librería para envíar mail de supervisión
 import traceback
-
 from my_lib import pi_connect as p, sent_mail as send, util as u
 import pandas as pd  # Librería de análisis de datos
 import datetime as dt
@@ -22,12 +21,14 @@ import installer as ins
 import sRemoto
 import re
 
+
 """ Variables globales """
 pi_svr = p.PIserver()
 excel_file = sRemoto.excel_file
 # hojas a utilizar del archivo excel:
 IccpSheet = "ICCP"
 AGCSheet = "AGC"
+SCentralSheet = "SISTEMA CENTRAL"
 TranslateSheet = "TRADUCCION"
 ColorSheet = "COLORES"
 
@@ -88,6 +89,41 @@ def process_html_iccp(df, df_indisp, df_hist, html_str):
     return html_str
 
 
+def process_central_system(str_html):
+    success_1, df, msg = u.read_excel(excel_file, sheet_name=SCentralSheet)
+    success_2, dict_t = u.get_state_translation(excel_file, sheet_name=TranslateSheet)
+    if not success_1 or not success_2:
+        return False, msg
+
+    df = df[df[u.lb_activa] == "x"]
+    del df[u.lb_activa]
+    str_tb = ""
+    for ix in df.index:
+        str_tb += "<tr>"
+        for col in df.columns:
+            value = df[col].loc[ix]
+            if "SERVIDOR" not in col and "nan" not in str(value):
+                tag_name = df[col].loc[ix]
+                pt = p.PI_point(pi_svr, tag_name)
+                if pt.pt is not None:
+                    value = str(pt.current_value())
+                    if value in dict_t.keys():
+                        value = dict_t[value]
+                if "spooling" == value:
+                    snap = pt.snapshot()
+                    value = str(snap.Value) + f" a partir de: {snap.Timestamp}"
+            elif "nan" in str(value):
+                value = ""
+
+            if str(value) == "INDISPONIBLE" or "spooling a partir" in str(value):
+                str_tb += f'<td style="background-color:#ff1a1a">{value}</td>'
+            else:
+                str_tb += f"<td>{value}</td>"
+        str_tb += "</tr>\n"
+    str_html = str_html.replace("<!--Inicio: CENTRAL_STATE-->", str_tb)
+    return str_html
+
+
 def bar(percentage):
     return f"<div class=\"meter\"> \n\t" \
            f"  <span style=\"width: {percentage * 0.75}%\"></span>  \n\t" \
@@ -135,7 +171,7 @@ def run_process_for(time_range_to_run):
     time_range = time_range_to_run
     recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
     # recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "cdhierro@cenace.org.ec", "dpanchi@cenace.org.ec"]
-    # recipients = ["rsanchez@cenace.org.ec"]
+    recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "anarvaez@cenace.org.ec"]
     from_email = "sistemacentral@cenace.org.ec"
     image_list = ["cenace.jpg", "./images/Molino AGC.png"]
     # procesando el archivo html con campos de sRemoto, ya que la tabla UTR es similar:
@@ -160,6 +196,9 @@ def run_process_for(time_range_to_run):
     df, df_hist = u.get_history_from(excel_file=excel_file, sheet_name=AGCSheet, time_range=time_range_to_run)
     # html processing
     str_html = process_agc_html(str_html, df, df_hist)
+
+    # procesando Sistema Central:
+    str_html = process_central_system(str_html)
 
     # encontrando imágenes en el archivo html
     regex = 'src=(".*(\\.jpg|\\.png)"){1}'
