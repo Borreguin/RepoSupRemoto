@@ -10,17 +10,15 @@ anexando las imágenes definidas en: image_list
 
 """
 
-# Librería de conexión con Pi-Server, # librería para envíar mail de supervisión
-import traceback
-from my_lib import pi_connect as p, sent_mail as send, util as u
-import pandas as pd  # Librería de análisis de datos
 import datetime as dt
-import codecs  # Leer archivo HTML como un string
 import os
+import re
+import traceback
+import pandas as pd  # Librería de análisis de datos
 import installer as ins
 import sRemoto
-import re
-
+# Librería de conexión con Pi-Server, # librería para envíar mail de supervisión
+from my_lib import pi_connect as p, send_mail as send, util as u
 
 """ Variables globales """
 pi_svr = p.PIserver()
