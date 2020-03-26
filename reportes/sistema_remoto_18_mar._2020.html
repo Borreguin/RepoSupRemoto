@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html><head>
+  <style>
+
+	#tbl_remoto {
+	  border-collapse: collapse;
+	  width: 100%;
+	}
+
+	td, th {
+	  border: 1px solid black;
+	  padding: 4px;
+	}
+
+	#tbl_remoto tr:nth-child(even){background-color: #f2f2f2;}
+
+	#tbl_remoto tr:hover {background-color: #c3d5d5;}
+
+	#tbl_remoto th {
+	  padding-top: 5px;
+	  padding-bottom: 5px;
+	  text-align: left;
+	  background-color: #d1e0e0;
+	  color: black;
+	}
+    td.prioridad_1{
+		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0); font-weight: bold
+	}
+	#prioridad_2{
+		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0); font-weight: bold
+	}
+	td.prioridad_3{
+		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102); font-weight: bold
+	}
+
+  .meter {
+	height: 18px;  /* Can be anything */
+	position: relative;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	padding: 1px;
+  }
+
+  .meter > span {
+    display: block;
+    height: 100%;
+    float: left;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: rgb(43,194,83);
+    box-shadow:
+      inset 0 2px 9px  rgba(255,255,255,0.3),
+      inset 0 -2px 6px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+</style>
+  <meta charset="utf-8">
+  <title>REPORTE DE SUPERVISIÓN </title>
+  	
+</head><body>
+<p style="text-align: left;"><img style="width: 100px; height: 50px;" alt="Logo CENACE" src="./images/cenace.jpg" align="middle">
+<p> <font size="+1"><strong><span >
+<span style="text-decoration: underline;">REPORTE DE SUPERVISIÓN</span></span></strong></font>
+</p>
+
+<p>Fecha: 18/03/2020 23:23:51</p>
+
+<hr><strong>REPORTE INSTANTANEO</strong>
+
+<hr><u>UTRs INDISPONIBLES AL MOMENTO</u>
+<p>De un total de 124 UTRs, se encuentran 3
+indisponibles</p>
+
+<p>Las UTRs indisponibles al momento son:</p>
+
+<table id="tbl_remoto" style="border: 1px solid black">
+
+  <tbody>
+    <tr style="background-color: #d1e0e0;">
+      <th scope="col" width="100">Nv. Criticidad</th>
+      <th scope="col" width="350">UTR</th>
+      <th scope="col" width="350">PROTOCOLO</th>
+      <th scope="col" width="350">ESTADO</th>
+    </tr>
+<tr  > <td style="vertical-align: top; text-align: center; background-color: rgb(255, 203, 0); font-weight: bold"; font-size: 10pt>MEDIO</td>  <td>REFINERIA</td> <td>DNP30TCPIP</td> <td>INDISPONIBLE</td></tr> 
+	<tr style="background-color: #f2f2f2;" > <td style="vertical-align: top; text-align: center; background-color: rgb(255, 203, 0); font-weight: bold"; font-size: 10pt>MEDIO</td>  <td>SAN IDELFONSO</td> <td>RP5</td> <td>INDISPONIBLE</td></tr> 
+	<tr  > <td style="vertical-align: top; text-align: center; background-color: rgb(255, 255, 255); font-weight: bold"; font-size: 10pt>NO CRÍTICO</td>  <td>CENTRAL ECOELECTRIC</td> <td>DNP</td> <td>INDISPONIBLE</td></tr> 
+	
+  </tbody>
+</table>
+
+<br>
+<br>
+<hr><strong>REPORTE DEL ÚLTIMO DÍA</strong>
+<hr style="width: 100%;"><u>UTRs CON INDISPONIBILIDAD SUPERIOR A 3.6 HORAS (Regulación ARCONEL - 003/16)</u>
+
+<p><span style="font-weight: normal;">PERIODO: Desde 17/mar./20 23:22
+hasta 18/mar./20 23:22</span><u> </u></p>
+
+<table id="tbl_remoto" style="border: 1px solid black">
+
+  <tbody>
+    <tr>
+     <th style="background-color: #d1e0e0;" scope="col" width="100">
+       RIESGO</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="350">
+       UTR</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="350">
+       PROTOCOLO</th>
+	 <th style="background-color: #d1e0e0;" scope="col" width="350">
+       TIEMPO INDISPONIBLE</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="350">
+       DISPONIBILIDAD DIARIA</th>
+    </tr>
+<tr  >   <td style="background-color: rgb(255,164,0)"> 67 %</td>  <td>REFINERIA</td> <td>DNP30TCPIP</td> <td>24 h 00 m</td> <td><div class="meter"> 
+	  <span style="width: 0.0%"></span>  
+	  <div style="float: right;">0.0%</div> 
+</div></td> </tr> 
+	<tr style="background-color: #f2f2f2;" >   <td style="background-color: rgb(255,164,0)"> 67 %</td>  <td>SAN IDELFONSO</td> <td>RP5</td> <td>24 h 00 m</td> <td><div class="meter"> 
+	  <span style="width: 0.0%"></span>  
+	  <div style="float: right;">0.0%</div> 
+</div></td> </tr> 
+	<tr  >   <td style="background-color: rgb(255,255,255)"> 0 %</td>  <td>CENTRAL ECOELECTRIC</td> <td>DNP</td> <td>15 h 12 m</td> <td><div class="meter"> 
+	  <span style="width: 27.48697916666667%"></span>  
+	  <div style="float: right;">36.6%</div> 
+</div></td> </tr> 
+	<tr style="background-color: #f2f2f2;" >   <td style="background-color: rgb(255,255,255)"> 0 %</td>  <td>CENTRAL GENEROCA</td> <td>DNP</td> <td>07 h 10 m</td> <td><div class="meter"> 
+	  <span style="width: 52.575520833333336%"></span>  
+	  <div style="float: right;">70.1%</div> 
+</div></td> </tr> 
+	
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<hr><strong>REPORTE SEMANAL</strong>
+<hr style="width: 100%;"><u>UTRs CON INDISPONIBILIDAD MAYOR A 4 DÍAS E INDISPONIBLES AL MOMENTO</u>
+
+<p><span style="font-weight: normal;">PERIODO: 11/3/2020 23:22:59 - 18/3/2020 23:22:59</span><u> </u></p>
+
+<table id="tbl_remoto" style="border: 1px solid black">
+
+  <tbody style="border: 1px solid black">
+    <tr style="background-color: #d1e0e0;">
+      <th  scope="col" width="100">RIESGO</th>
+      <th style="background-color: #d1e0e0;" scope="col" width="350">UTR</th>
+      <th style="background-color: #d1e0e0;" scope="col" width="350">PROTOCOLO</th>
+	  <th style="background-color: #d1e0e0;" scope="col" width="350">DISPONIBILIDAD SEMANAL</th>
+      <th style="background-color: #d1e0e0;" scope="col" width="350">RESUMEN </th>
+    </tr>
+<tr  >  <td style="background-color: rgb(255,164,0)"> 67 %</td>  <td>REFINERIA</td>  <td>DNP30TCPIP</td> <td>0.0 %</td> 	 <td><div><img alt="./images/rep_utr_REFINERIA_18_mar._2020.png" src="./images/rep_utr_REFINERIA_18_mar._2020.png"> </div> 
+</td></tr> 
+<tr style="background-color: #f2f2f2;" >  <td style="background-color: rgb(255,164,0)"> 67 %</td>  <td>SAN IDELFONSO</td>  <td>RP5</td> <td>0.0 %</td> 	 <td><div><img alt="./images/rep_utr_SAN IDELFONSO_18_mar._2020.png" src="./images/rep_utr_SAN IDELFONSO_18_mar._2020.png"> </div> 
+</td></tr> 
+
+  </tbody>
+</table>
+
+<br>
+<br>
+
+
+<hr style="width: 100%">
+<p>&nbsp;Atentamente,</p>
+
+<p>Sistema Remoto</p>
+
+</body></html>

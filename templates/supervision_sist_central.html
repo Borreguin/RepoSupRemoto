@@ -7,7 +7,7 @@
 	  width: 100%;
 	}
 
-	#tbl_remoto td, #tbl_remoto th {
+	td, th {
 	  border: 1px solid black;
 	  padding: 4px;
 	}
@@ -25,13 +25,13 @@
 	}
 	
 	#prioridad_1{
-		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0)
+		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0); font-weight: bold
 	}
 	#prioridad_2{
-		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0)
+		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0); font-weight: bold
 	}
 	#prioridad_3{
-		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102)
+		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102); font-weight: bold
 	}
 
   .meter {
@@ -77,11 +77,11 @@ indisponibles</p>
 
 <p>Las UTRs indisponibles al momento son:</p>
 
-<table border="1"  id="tbl_remoto" >
+<table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
 
   <tbody>
-    <tr>
-        <th style="vertical-align: top; width: 2px"><br></th>
+    <tr style="background-color: #d1e0e0;">
+        <th scope="col" width="100">Nv. Criticidad</th>
         <th scope="col" width="350">UTR</th>
         <th scope="col" width="350">PROTOCOLO</th>
         <th scope="col" width="350">ESTADO</th>
@@ -96,13 +96,13 @@ indisponibles</p>
 <p>De un total de (#no_ICCP) enlaces, se encuentran (#no_ICCP_indisponible) indisponibles: </p>
 
 <!-- INI:ICCP-->
-<table id="tbl_remoto" border="1">
+<table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
   <tbody>
-    <tr>
-        <th style="vertical-align: top; width: 2px"><br></th>
+    <tr style="background-color: #d1e0e0;">
+        <th scope="col" width="100">Nv. Criticidad</th>
         <th scope="col" width="300">ICCP<br></th>
         <th scope="col" width="350">ESTADO<br></th>
-        <th scope="col" width="350">% DISPONIBILIDAD<br></th>
+        <th scope="col" width="350">DISPONIBILIDAD DIARIA<br></th>
         <th scope="col" width="350">OBSERVACIONES<br>
       </th>
     </tr>
@@ -112,9 +112,9 @@ indisponibles</p>
 <!-- END:ICCP-->
 
 <p>Estado de los enclaces ICCP de mayor importancia:</p>
-<table id="tbl_remoto" border="1">
+<table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
   <tbody>
-    <tr>
+    <tr style="background-color: #d1e0e0;">
         <th scope="col" width="300">ICCP<br></th>
         <th scope="col" width="300">ESTADO<br></th>
         <th scope="col" width="350">RESUMEN<br></th>
@@ -128,10 +128,10 @@ indisponibles</p>
 <hr><strong>OPERACIÓN DEL AGC</strong>
 <hr> <br>
 
-<table id="tbl_remoto" border="1">
+<table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
 
   <tbody>
-    <tr>
+    <tr style="background-color: #d1e0e0;">
       <th scope="col" width="350">CENTRAL<br></th>
       <th scope="col" width="350">MODO DE OPERACIÓN<br></th>
       <th scope="col" width="350">ESTADO<br></th>
@@ -144,9 +144,9 @@ indisponibles</p>
 <hr><strong>SISTEMA CENTRAL</strong>
 <hr> <br>
 
-<table  id="tbl_remoto" border="1">
+<table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
     <tbody>
-    <tr>
+    <tr style="background-color: #d1e0e0;">
         <th scope="col" style="width: 350px;">SERVIDOR</th>
         <th scope="col" width="350" style="background-color:#99bbff">ONLINE<br></th>
         <th scope="col" width="350" style="background-color:#99bbff">ESTADO<br></th>

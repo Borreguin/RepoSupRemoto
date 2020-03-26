@@ -26,17 +26,24 @@ excel_file = sRemoto.excel_file
 # hojas a utilizar del archivo excel:
 IccpSheet = "ICCP"
 AGCSheet = "AGC"
-SCentralSheet = "SISTEMA CENTRAL"
+SCentralSheet = "sCentral"
 TranslateSheet = "TRADUCCION"
 ColorSheet = "COLORES"
+even_color = "#f2f2f2"
 
 """ Configuraciones del script """
 reporte_path = sRemoto.reporte_path
 script_path = os.path.dirname(os.path.abspath(__file__))
-html_central_file = os.path.join(script_path, "templates", "supervision_prg_SCADA.html")
+html_central_file = os.path.join(script_path, "templates", "supervision_sist_central.html")
 images_path = os.path.join(reporte_path, "images")
 fmt_dd_mm_yy_ = u.fmt_dd_mm_yy_
 time_range = None
+minutos_dia = 60 * 24
+criticidad = ["", "ALTO", "MEDIO", "BAJO", "NO CRÍTICO"]
+prioridad_styles = ["", 'style="vertical-align: top; text-align: center; background-color: rgb(255, 0, 0); font-weight: bold"; font-size: 10pt',
+                    'style="vertical-align: top; text-align: center; background-color: rgb(255, 203, 0); font-weight: bold"; font-size: 10pt',
+                    'style="vertical-align: top; text-align: center; background-color: rgb(255, 255, 102); font-weight: bold"; font-size: 10pt',
+                    'style="vertical-align: top; text-align: center; background-color: rgb(255, 255, 255); font-weight: bold"; font-size: 10pt'  ]
 
 
 def process_html_iccp(df, df_indisp, df_hist, html_str):
@@ -44,8 +51,8 @@ def process_html_iccp(df, df_indisp, df_hist, html_str):
     # realizando las sustituciones necesarias para llenar el formulario HTML:
     html_str = html_str.replace("(#no_ICCP)", str(len(df.index)))
     html_str = html_str.replace("(#no_ICCP_indisponible)", str(len(df_indisp)))
-    f_text = df[u.lb_filter].iloc[0]
-    mask = (df[sRemoto.lb_per_dispo] < 99.5) | (df[sRemoto.lb_state] == str(f_text))
+    df[sRemoto.lb_per_dispo] = [round(tiempo_disp/minutos_dia*100,1) for tiempo_disp in df[u.lb_tiempo]]
+    mask = (df[sRemoto.lb_per_dispo] < 99.5) | (df[sRemoto.lb_state] == df[u.lb_filter])
     # mask = (df[sRemoto.lb_state] == str(f_text))
     df_to_process = df[mask]
     state_str = str()
@@ -87,6 +94,12 @@ def process_html_iccp(df, df_indisp, df_hist, html_str):
     return html_str
 
 
+def even_row_style(c):
+    if c % 2 == 1:
+        return f'style="background-color: {even_color};"'
+    return ""
+
+
 def process_central_system(str_html):
     success_1, df, msg = u.read_excel(excel_file, sheet_name=SCentralSheet)
     success_2, dict_t = u.get_state_translation(excel_file, sheet_name=TranslateSheet)
@@ -96,8 +109,8 @@ def process_central_system(str_html):
     df = df[df[u.lb_activa] == "x"]
     del df[u.lb_activa]
     str_tb = ""
-    for ix in df.index:
-        str_tb += "<tr>"
+    for c, ix in enumerate(df.index):
+        str_tb += f"<tr {even_row_style(c)}>"
         for col in df.columns:
             value = df[col].loc[ix]
             if "SERVIDOR" not in col and "nan" not in str(value):
@@ -125,8 +138,14 @@ def process_central_system(str_html):
 def bar(percentage):
     return f"<div class=\"meter\"> \n\t" \
            f"  <span style=\"width: {percentage * 0.75}%\"></span>  \n\t" \
-           f"  <div style=\"float: right;\">{percentage}</div> \n" \
+           f"  <div style=\"float: right;\">{percentage} %</div> \n" \
            f"</div>"
+
+
+def get_priority_style(priority):
+    if 0 <= priority < len(prioridad_styles):
+        return prioridad_styles[priority]
+    return ""
 
 
 def populate_state_table(prioridad, name, state, p_disponibilidad):
@@ -134,7 +153,11 @@ def populate_state_table(prioridad, name, state, p_disponibilidad):
         state = "DISPONIBLE"
     elif state == "Down":
         state = "INDISPONIBLE"
-    return f"<tr> <td id=\"prioridad_{prioridad}\"></td>  <td>{name}</td> <td>{state}</td> " \
+    to_put = ""
+    if prioridad >= 0 and prioridad < len(criticidad):
+        to_put = criticidad[prioridad]
+    return f"<tr><td {get_priority_style(prioridad)}>{to_put}</td>  " \
+           f"<td>{name}</td> <td>{state}</td> " \
            f"<td>{bar(p_disponibilidad)} </td> <td> </td> </tr> \n"
 
 
@@ -169,22 +192,27 @@ def run_process_for(time_range_to_run):
     time_range = time_range_to_run
     recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
     # recipients = ["rsanchez@cenace.org.ec", "jenriquez@cenace.org.ec", "anarvaez@cenace.org.ec"]
+    recipients = ["rsanchez@cenace.org.ec"]
     from_email = "sistemacentral@cenace.org.ec"
-    image_list = ["cenace.jpg", "./images/Molino AGC.png"]
+
     # procesando el archivo html con campos de sRemoto, ya que la tabla UTR es similar:
     # Estado de UTRs:
-    df, df_filter, df_indisp = u.process_excel_file(excel_file=excel_file, sheet_name=sRemoto.sRemotoSheet,
-                                                    time_range_to_run=time_range_to_run)
+    df = u.process_avalability_from_excel_file(excel_file=excel_file, sheet_name=sRemoto.sRemotoSheet,
+                                                                     time_range_to_run=time_range_to_run)
+
+    # filtrando aquellas que están indisponibles:
+    df_filter = df[df[u.lb_state] == df[u.lb_filter]].copy()
     sRemoto.time_range = time_range_to_run  # definiendo periodo de supervisión
-    sRemoto.html_remoto_file = html_central_file  # definiendo plantilla a utilizar
-    str_html = sRemoto.process_html_file(df, df_filter, df_indisp)  # llenando la plantilla
+    sRemoto.html_template = html_central_file  # definiendo plantilla a utilizar
+    str_html = sRemoto.process_html_file(df, df_filter, df_filter)  # llenando la plantilla
 
     # procesando el archivo html con estado de enlaces ICCP:
     # Estado de ICCP:
-    df, df_filter, df_indisp = u.process_excel_file(excel_file=excel_file, sheet_name=IccpSheet,
-                                                    time_range_to_run=time_range_to_run)
+    df = u.process_avalability_from_excel_file(excel_file=excel_file, sheet_name=IccpSheet,
+                                                                     time_range_to_run=time_range_to_run)
 
     _, df_hist = u.get_history_from(excel_file=excel_file, sheet_name=IccpSheet, time_range=time_range)
+    df_indisp = df[df[u.lb_state] == df[u.lb_filter]]
 
     # procesando la información ICCP en el archivo ICCP:
     str_html = process_html_iccp(df, df_indisp, df_hist, str_html)
@@ -197,7 +225,7 @@ def run_process_for(time_range_to_run):
     # procesando Sistema Central:
     str_html = process_central_system(str_html)
 
-    # encontrando imágenes en el archivo html
+    # encontrando imágenes en el archivo html y enviando el reporte por correo electrónico
     regex = 'src=(".*(\\.jpg|\\.png)"){1}'
     image_list = re.findall(regex, str_html)
     image_list = [im[0].replace('"', '') for im in image_list]

@@ -7,6 +7,7 @@ import datetime as dt
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.colors as colors
 from matplotlib.collections import PolyCollection
 from my_lib import pi_connect as p
 yyyy_mm_dd_hh_mm_ss = "%d-%m-%Y %H:%M:%S"
@@ -18,7 +19,7 @@ pi_svr = p.PIserver()
 lb_tag = "Tag"
 lb_name = "Nombre"
 lb_expression = "Expresion"
-lb_tiempo = "Tiempo"
+lb_tiempo = "Tiempo Disponibilidad en minutos"
 lb_per_dispo = "Porcentaje_Disp"
 lb_state = "Estado"
 lb_date = "Fecha"
@@ -43,8 +44,8 @@ def define_time_range_for_last_week():
     return time_range
 
 
-def process_excel_file(excel_file, sheet_name, time_range_to_run,
-                       span=pi_svr.span("1d"), time_unit="di"):
+def process_avalability_from_excel_file(excel_file, sheet_name, time_range_to_run,
+                                        span=pi_svr.span("1d"), time_unit="mi"):
 
     # leyendo archivo Excel y filtrando aquellos que están activos:
     df = pd.read_excel(excel_file, sheet_name=sheet_name)
@@ -65,18 +66,11 @@ def process_excel_file(excel_file, sheet_name, time_range_to_run,
         if pt.pt is not None:
             value = pt.time_filter(time_range_to_run, expression, span, time_unit)
             df.loc[[ix], lb_tiempo] = value[tag_name][0]
-            df.loc[[ix], lb_per_dispo] = round(value[tag_name][0]*100, 1)
             df.loc[[ix], lb_state] = str(pt.snapshot().Value)
             df.loc[[ix], lb_date] = str(pt.snapshot().Timestamp)
             df.loc[[ix], lb_period] = str(time_range_to_run).replace("00:00:00", "")
-
-    df.sort_values(by=[lb_prioridad,  lb_per_dispo], inplace=True)
-    mask = (df[lb_per_dispo] < 99.5)
-    df_filter = df[mask].copy()
-    filter_exp = df[lb_filter].iloc[0]
-    df_indisp = df[df[lb_state] == f"{filter_exp}"].copy()
-    df_filter.sort_values(by=[lb_prioridad,  lb_per_dispo], inplace=True)
-    return df, df_filter, df_indisp
+    df.sort_values(by=[lb_prioridad, lb_tiempo], inplace=True)
+    return df
 
 
 def get_history_from(excel_file, sheet_name, time_range, span=pi_svr.span("10 m")):
@@ -102,6 +96,15 @@ def get_history_from(excel_file, sheet_name, time_range, span=pi_svr.span("10 m"
     df_hist = df_hist[tgs]
 
     return df, df_hist
+
+
+def get_block(from_label: str, to_label: str, html_str: str):
+    str_result = str()
+    from_index = html_str.find(from_label)
+    to_index = html_str.find(to_label)
+    if from_index > 0 and to_index > 0:
+        str_result = html_str[from_index + len(from_label): to_index]
+    return str_result
 
 
 def replace_block(from_label: str, to_label: str, html_str: str, to_replace: str):
@@ -251,3 +254,39 @@ def generate_bar_estatus(series: pd.Series, fig_size, path_to_save: str = None, 
             return False, fig
     else:
         return True, fig
+
+
+def hazard_matrix():
+    import numpy as np
+    plt.rcParams.update({'font.size': 16})
+    critic_level = [0.0, 0.33, 0.67, 1]
+    critic_name = ["No \ncrítico", "Baja", "Media", "Alta"]
+    n = 7
+    availability_level = [x/n for x in range(n+1)]
+    df = pd.DataFrame(columns=[str(a) for a in availability_level],
+                      index=[str(c) for c in critic_level])
+    for c in critic_level:
+        for a in availability_level:
+            df.loc[[str(c)], [str(a)]] = int(c*(a)*100)
+    print(df.info())
+    color_lst = [(0, 'white'), (0.33, 'yellow'), (0.67, 'orange'), (1, 'red')]
+    cmap = colors.LinearSegmentedColormap.from_list("risk_scale", color_lst)
+
+    fig, ax = plt.subplots(1, 1, figsize=(9, 7))
+    pcm = ax.pcolor(df, cmap=cmap)
+    ax.set_yticks(np.arange(0.5, len(df.index), 1))
+    ax.set_xticks(np.arange(0.5, len(df.columns), 1))
+    ax.set_yticklabels(critic_name)
+    ax.set_xticklabels([str(round(x, 1))  for x in availability_level])
+    ax.set_ylabel("Nivel de Criticidad")
+    ax.set_xlabel("Indisponibilidad")
+
+    cbar = fig.colorbar(pcm, ax=ax, orientation='vertical', pad=0.09)
+    cbar.ax.set_title('Riesgo (%)', y=1.04)
+
+    plt.tight_layout()
+    plt.show()
+    print(df)
+
+# hazard_matrix()
+

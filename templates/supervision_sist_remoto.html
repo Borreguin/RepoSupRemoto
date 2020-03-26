@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html><head>
   <style>
+
 	#tbl_remoto {
 	  border-collapse: collapse;
 	  width: 100%;
 	}
 
-	#tbl_remoto td, #tbl_remoto th {
+	td, th {
 	  border: 1px solid black;
 	  padding: 4px;
 	}
@@ -22,15 +23,14 @@
 	  background-color: #d1e0e0;
 	  color: black;
 	}
-	
-	#prioridad_1{
-		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0)
+    td.prioridad_1{
+		vertical-align: top; text-align: center; background-color: rgb(255, 0, 0); font-weight: bold
 	}
 	#prioridad_2{
-		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0)
+		vertical-align: top; text-align: center; background-color: rgb(255, 203, 0); font-weight: bold
 	}
-	#prioridad_3{
-		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102)
+	td.prioridad_3{
+		vertical-align: top; text-align: center; background-color: rgb(255, 255, 102); font-weight: bold
 	}
 
   .meter {
@@ -76,11 +76,11 @@ indisponibles</p>
 
 <p>Las UTRs indisponibles al momento son:</p>
 
-<table id="tbl_remoto">
+<table id="tbl_remoto" style="border: 1px solid black">
 
   <tbody>
-    <tr>
-      <th style="vertical-align: top; width: 2px"><br></th>
+    <tr style="background-color: #d1e0e0;">
+      <th scope="col" width="100">Nv. Criticidad</th>
       <th scope="col" width="350">UTR</th>
       <th scope="col" width="350">PROTOCOLO</th>
       <th scope="col" width="350">ESTADO</th>
@@ -92,21 +92,25 @@ indisponibles</p>
 <br>
 <br>
 <hr><strong>REPORTE DEL ÚLTIMO DÍA</strong>
-<hr style="width: 100%;"><u>UTRs CON INDICE DE
-DISPONIBILIDAD MENOR AL 99.5% </u>
+<hr style="width: 100%;"><u>UTRs CON INDISPONIBILIDAD SUPERIOR A 3.6 HORAS (Regulación ARCONEL - 003/16)</u>
 
 <p><span style="font-weight: normal;">PERIODO: Desde (#ayer)
 hasta (#hoy)</span><u> </u></p>
 
-<table id="tbl_remoto">
+<table id="tbl_remoto" style="border: 1px solid black">
 
   <tbody>
     <tr>
-      <th style="vertical-align: top; width: 2px"><br></th>
-      <th scope="col" width="350">UTR</th>
-      <th scope="col" width="350">PROTOCOLO</th>
-	  <th scope="col" width="350">TIEMPO INDISPONIBLE</th>
-      <th scope="col" width="350">% DISPONIBILIDAD</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="100">
+       RIESGO</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="350">
+       UTR</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="350">
+       PROTOCOLO</th>
+	 <th style="background-color: #d1e0e0;" scope="col" width="350">
+       TIEMPO INDISPONIBLE</th>
+     <th style="background-color: #d1e0e0;" scope="col" width="350">
+       DISPONIBILIDAD DIARIA</th>
     </tr>
 <!--Inicio: UTR_INDISPONIBLE-->
   </tbody>
@@ -116,20 +120,19 @@ hasta (#hoy)</span><u> </u></p>
 <br>
 
 <hr><strong>REPORTE SEMANAL</strong>
-<hr style="width: 100%;"><u>UTRs CON ÍNDICE DE
-DISPONIBILIDAD MENOR AL 99.5% E INDISPONIBLES </u>
+<hr style="width: 100%;"><u>UTRs CON INDISPONIBILIDAD MAYOR A 4 DÍAS E INDISPONIBLES AL MOMENTO</u>
 
 <p><span style="font-weight: normal;">PERIODO: (#periodo_semanal)</span><u> </u></p>
 
-<table id="tbl_remoto">
+<table id="tbl_remoto" style="border: 1px solid black">
 
-  <tbody>
-    <tr>
-      <th style="vertical-align: top; width: 2px"><br></th>
-      <th scope="col" width="350">UTR</th>
-      <th scope="col" width="350">PROTOCOLO</th>
-	  <th scope="col" width="350">% DISPONIBILIDAD</th>
-      <th scope="col" width="350">RESUMEN </th>
+  <tbody style="border: 1px solid black">
+    <tr style="background-color: #d1e0e0;">
+      <th  scope="col" width="100">RIESGO</th>
+      <th style="background-color: #d1e0e0;" scope="col" width="350">UTR</th>
+      <th style="background-color: #d1e0e0;" scope="col" width="350">PROTOCOLO</th>
+	  <th style="background-color: #d1e0e0;" scope="col" width="350">DISPONIBILIDAD SEMANAL</th>
+      <th style="background-color: #d1e0e0;" scope="col" width="350">RESUMEN </th>
     </tr>
 <!--Inicio: UTR_SEMANAL-->
   </tbody>
