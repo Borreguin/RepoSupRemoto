@@ -236,7 +236,7 @@ def run_process_for(time_range_to_run):
     reporte_path = os.path.join(reporte_path,
                                 f"sistema_central_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")
     u.save_html(str_html, reporte_path)
-
+    return True, f"[{dt.datetime.now()}]El reporte de sistema central ha sido enviado existosamente a: {recipients}"
 
 if __name__ == "__main__":
     try:

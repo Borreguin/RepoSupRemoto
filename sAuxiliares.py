@@ -114,8 +114,10 @@ def run_process_now():
     df_config = df_config[df_config[lb_activa] == "x"]
 
     # definiendo configuraciones para mail:
-    # recipients = ["mbautista@cenace.org.ec", "ems@cenace.org.ec"]
-    recipients = ["rsanchez@cenace.org.ec", "farmas@cenace.org.ec"]
+    # recipients = ["jcepeda@cenace.org.ec", "mbautista@cenace.org.ec", "ems@cenace.org.ec", "farmas@cenace.org.ec",
+    #              "rsanchez@cenace.org.ec"]
+
+    recipients = ["rsanchez@cenace.org.ec"]
     from_email = "sistemasauxiliares@cenace.org.ec"
 
     # leyendo la plantilla para el reporte
@@ -180,6 +182,7 @@ def run_process_now():
                    dt.datetime.now().strftime("%d/%m/%Y"),
                    recipients, from_email, image_list)
 
+    return True, f"[{dt.datetime.now()}]El reporte de sistema auxiliares ha sido enviado existosamente a: {recipients}"
 
 if __name__ == "__main__":
     try:

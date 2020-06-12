@@ -276,6 +276,7 @@ def run_process_for(time_range_to_run):
 
     send.send_mail(str_html, "Supervisión Sistema Remoto " + dt.datetime.now().strftime("%d/%m/%Y"),
                    recipients, from_email, image_list)
+    return True, f"[{dt.datetime.now()}]El reporte de sistema remoto ha sido enviado existosamente a: {recipients}"
 
 
 if __name__ == "__main__":
