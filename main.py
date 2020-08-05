@@ -1,3 +1,5 @@
+# Version Final: 5 Agosto 2020
+
 import logging
 import os
 import datetime as dt
