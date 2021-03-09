@@ -67,24 +67,25 @@ def get_hvac_info_for(ip_address, token, page_name):
     if not success:
         return False, f"No es posible consultar la página: {url_info} \n" + str(result)
 
-    try:
-        page = urlopen(url_info)
-        soup = BeautifulSoup(page, 'html.parser')
-        if "UnitOverview.htm" == page_name:
-            content = soup.findAll("div", {"id": "body"})[0]
-            for ix in [1, 3]:
-                try:
-                    content.contents[ix].contents[1].contents[3] = "\n"
-                except:
-                    pass
-            table = ""
+    success, table = False, f"No es posible consultar la página: {url_info} \n" + str(result)
+    for i in range(5):
 
-            table = str(content).replace("<div>", '<div style="padding: 4px; clear:both; font-size: 11pt"; line-height:20px;>')
-            table = table.replace('style="height:180px;"', 'style="height:130px;"')
-            table = provide_style_to(table, estilos)
-            return True, table
+        try:
+            page = urlopen(url_info)
+            soup = BeautifulSoup(page, 'html.parser')
+            if "UnitOverview.htm" == page_name:
+                content = soup.findAll("div", {"id": "body"})[0]
+                for ix in [1, 3]:
+                    try:
+                        content.contents[ix].contents[1].contents[3] = "\n"
+                    except:
+                        pass
+                table = str(content).replace("<div>", '<div style="padding: 4px; clear:both; font-size: 11pt"; line-height:20px;>')
+                table = table.replace('style="height:180px;"', 'style="height:130px;"')
+                table = provide_style_to(table, estilos)
+                success = True
 
-    except Exception as e:
-        return False, f"Problemas al consultar la página: {url_info} \n" + str(e)
+        except Exception as e:
+            success, table = False, f"Problemas al consultar la página: {url_info} \n" + str(e)
 
-    return False, f"Página no encontrada: {url_info}"
+    return success, table

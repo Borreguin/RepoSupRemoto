@@ -30,7 +30,8 @@ if __name__ == "__main__":
     init_logger()
     # Definiendo fecha de la supervisión
     yesterday = u.define_time_range_for_yesterday()
-
+    msg = "Empezando el proceso de reporte"
+    logger.info(msg)
     # Ejecutando Reporte de Sistema Remoto
     try:
         success, msg = sRemoto.run_process_for(yesterday)
@@ -56,4 +57,7 @@ if __name__ == "__main__":
         success, msg = sAuxiliares.run_process_now()
         logger.info(msg)
     except Exception as e:
-        print(traceback.format_exc())
+        msg = f"[{dt.datetime.now()}] Problema al correr Reporte de Sistemas Auxiliares \n " + str(e) + "\n" \
+              + traceback.format_exc()
+        print(msg)
+        logger.error(msg)

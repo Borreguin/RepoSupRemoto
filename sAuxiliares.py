@@ -48,7 +48,7 @@ html_template = os.path.join(script_path, "templates", "supervision_sist_auxilia
 
 
 def process_data_for_hvac(ip_address, password):
-    """ Log in to the UPS, Let´s try 3 times at least if there is a problem """
+    """ Log in to the HVACs, Let´s try 3 times at least if there is a problem """
     success, token, msg = None, None, ""
     for ix in range(3):
         success, token, msg = hvac_con.log_in_hvac(ip_address, password)
@@ -84,7 +84,7 @@ def process_data_for_ups(ip_address, user, password):
     html_str = str()
     for page in pages:
         success, str_info = ups_con.get_ups_info_for(ip_address, token, page)
-        str_info =  ups_con.provide_style_to(str_info, ups_con.estilos)
+        str_info = ups_con.provide_style_to(str_info, ups_con.estilos)
         if success:
             html_str += str_info
     """ Haciendo Log out del UPS """
@@ -110,14 +110,14 @@ def run_process_now():
     global reporte_path
 
     # leyendo información de configuración desde archivo excel
-    df_config = pd.read_excel(excel_file, sheet_name=sheet_name)
+    df_config = pd.read_excel(excel_file, sheet_name=sheet_name, engine='openpyxl')
     df_config = df_config[df_config[lb_activa] == "x"]
 
     # definiendo configuraciones para mail:
-    # recipients = ["jcepeda@cenace.org.ec", "mbautista@cenace.org.ec", "ems@cenace.org.ec", "farmas@cenace.org.ec",
-    #              "rsanchez@cenace.org.ec"]
+    recipients = ["jcepeda@cenace.org.ec", "mbautista@cenace.org.ec", "ems@cenace.org.ec", "farmas@cenace.org.ec",
+                  "rsanchez@cenace.org.ec"]
 
-    recipients = ["rsanchez@cenace.org.ec"]
+    # recipients = ["rsanchez@cenace.org.ec"]
     from_email = "sistemasauxiliares@cenace.org.ec"
 
     # leyendo la plantilla para el reporte
@@ -138,11 +138,11 @@ def run_process_now():
         user = df_ups[lb_usuario].loc[idx]
         password = df_ups[lb_password].loc[idx]
         # get information from ups
-        success, current_hvac_state = process_data_for_ups(ip, user, password)
+        success, current_ups_state = process_data_for_ups(ip, user, password)
         # colocando en el formato definido en la plantilla
-        current_hvac_state = ups_html_state.replace(tag_ups_state, current_hvac_state)
-        current_hvac_state = current_hvac_state.replace("Estado UPS", equipo)
-        ups_block_states += current_hvac_state
+        current_ups_state = ups_html_state.replace(tag_ups_state, current_ups_state)
+        current_ups_state = current_ups_state.replace("Estado UPS", equipo)
+        ups_block_states += current_ups_state
 
     # Colocando el estado de todos los UPS:
     html_str = u.replace_block(ini_ups_state, end_ups_state, html_str, ups_block_states)
@@ -183,6 +183,7 @@ def run_process_now():
                    recipients, from_email, image_list)
 
     return True, f"[{dt.datetime.now()}]El reporte de sistema auxiliares ha sido enviado existosamente a: {recipients}"
+
 
 if __name__ == "__main__":
     try:

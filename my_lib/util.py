@@ -114,7 +114,7 @@ def replace_block(from_label: str, to_label: str, html_str: str, to_replace: str
     if from_index > 0 and to_index > 0:
         str_result = html_str[:from_index] + to_replace + html_str[to_index:]
     return str_result
-290
+
 
 def save_html(html_str, path_html_to_save):
     # Guardar el archivo html en la carpeta reportes:
