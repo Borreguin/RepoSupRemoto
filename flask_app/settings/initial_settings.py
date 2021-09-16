@@ -123,5 +123,4 @@ for repo in REPOS:
 
 # getting the definitive path for each one in same order:
 LOGS_REPO, EXCEL_REPO, SREMOTO_REPO, SCENTRAL_REPO, TEMPLATES_REPO, \
-    
 IMAGES_REPO, REPORTS_REPO, TEMP_REPO = FINAL_REPO
