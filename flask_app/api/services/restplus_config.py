@@ -21,10 +21,10 @@ import re
 api_log = LogDefaultConfig("api_services.log").logger
 
 api = Api(version=VERSION, title='API - REPORTES DE SUPERVISION',
-          contact="Roberto Sánchez A",
-          contact_email="rg.sanchez.a@gmail.com",
+          contact="Roberto Sánchez A,Carlos del Hierro",          
+          contact_email="rg.sanchez.a@gmail.com; cenaceremoto@gmail.com",
           contact_url="https://github.com/Borreguin",
-          description='Esta API permite calcular/consultar todo lo referente a la disponibilidad de Sistema Remoto',
+          description='Esta API permite realizar el envío del reporte de supervisión bajo demanda',          
           ordered=False)
 
 
