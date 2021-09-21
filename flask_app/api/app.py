@@ -26,13 +26,8 @@ from waitress import serve
 
 """ EndPoints """
 # namespaces: Todos los servicios de esta API
-from flask_app.api.services.sRemoto.endpoints.api_admin_sRemoto import ns as namespace_admin_sRemoto
-from flask_app.api.services.sRemoto.endpoints.api_admin_report import ns as namespace_admin_report
-from flask_app.api.services.Consignaciones.endpoints.api_admin_consignacion import ns as namespace_admin_consignacion
-from flask_app.api.services.Files.api_files import ns as namespace_files
-from flask_app.api.services.sRemoto.endpoints.api_disp_sRemoto import ns as namespace_disp_sRemoto
-from flask_app.api.services.CustomReports.endpoints.api_sRemoto import ns as namespace_sRemoto
-
+from flask_app.api.services.sRemoto.endpoints.api_admin_sRemoto import ns as namespace_admin_report
+from flask_app.api.services.sRemoto.endpoints.api_execute_sRemoto import ns as namespace_exec_report
 """ global variables """
 from flask_app.api.app_config import log  # Logger
 
@@ -49,13 +44,8 @@ def adding_end_points(blueprint, app):
 
     # adding Endpoints to this API
     # añadiendo los servicios de la API (EndPoints)
-    api_p.add_namespace(namespace_admin_sRemoto)
     api_p.add_namespace(namespace_admin_report)
-    api_p.add_namespace(namespace_disp_sRemoto)
-    api_p.add_namespace(namespace_admin_consignacion)
-    api_p.add_namespace(namespace_files)
-    api_p.add_namespace(namespace_sRemoto)
-
+    api_p.add_namespace(namespace_exec_report)
     # registrando las rutas:
     app.register_blueprint(blueprint)
 
