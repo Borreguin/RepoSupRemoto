@@ -61,7 +61,7 @@ def send_mail(msg_to_send: str, subject, recipients: list, from_email, image_lis
                     im_to_append.append(to_check)
 
         # configuraciones generales:
-        SERVER = "mail.cenace.org.ec"
+        SERVER = init.SERVER_EMAIL
 
         # create message object instance
         msg = MIMEMultipart('related')

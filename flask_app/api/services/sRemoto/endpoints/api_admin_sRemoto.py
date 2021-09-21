@@ -95,6 +95,51 @@ class ConfigUTR(Resource):
         """
         pass
 
+@ns.route('/users')
+class Users(Resource):
+
+    def get(self):
+        """
+        Obtiene los usuarios
+        """
+        #leer archivo de excel con path
+        user_config_path=os.path.join(init.SREMOTO_REPO,"users.xlsx")
+        df_user = pd.read_excel(user_config_path, index_col="ID")
+        users=df_user.to_dict(orient="records")
+        return dict(success=True,msg="Usuarios encontrados",users=users)
+
+@ns.route('/user/<string:id>/active')
+class ActiveUser(Resource):
+
+    def post(self, id: str = "ID"):
+        """Activa usuario"""
+        # leer archivo de excel con path
+        user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
+        df_user = pd.read_excel(user_config_path, index_col="ID")
+        if not id in df_user.index:
+            return dict(success=False, msg="Usuario no encontrado"), 404
+        user = df_user.loc[id]
+        user["Activado"] = True
+        df_user.loc[id] = user
+        df_user.to_excel(user_config_path)
+        return dict(success=True, msg="Usuario Activado")
+
+@ns.route('/user/<string:id>/desactive')
+class ActiveUser(Resource):
+
+    def post(self, id: str = "ID"):
+        """Desactiva usuario"""
+        # leer archivo de excel con path
+        user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
+        df_user = pd.read_excel(user_config_path, index_col="ID")
+        if not id in df_user.index:
+            return dict(success=False, msg="Usuario no encontrado"), 404
+        user = df_user.loc[id]
+        user["Activado"] = False
+        df_user.loc[id] = user
+        df_user.to_excel(user_config_path)
+        return dict(success=True, msg="Usuario Desactivado")
+
 # @ns.route('/nodo/id/<string:id_nodo>/desactivado')
 # class SRNodeAPIDeactivated(Resource):
 #

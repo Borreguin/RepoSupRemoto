@@ -9,11 +9,12 @@
     "My work is well done to honor God at any time" R Sanchez A.
     Mateo 6:33
 """
-
+from flask_app.api.services.sRemoto.endpoints import *
 from flask_restplus import Resource
 from flask import request, send_from_directory
 import re
 # importando configuraciones iniciales
+from flask_app.my_lib.SendMail.send_mail import send_mail
 from flask_app.my_lib.utils import set_max_age_to_response
 from flask_app.api.services.restplus_config import api
 from flask_app.api.services.sRemoto import serializers as srl
@@ -43,8 +44,16 @@ class PruebaReport(Resource):
         """
         Mail de prueba
         """
-        pass
-#
+        # leer archivo de excel con path
+        user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
+        df_user = pd.read_excel(user_config_path, index_col="ID")
+        mask=df_user["Grupo"]==user_group
+        df_filter=df_user[mask]
+        users=list(df_filter["Correo"])
+        success,msg=send_mail("Esta es una prueba","TEST",users,init.EMAIL_SREMOTO)
+        return dict(success=success,msg=msg),200 if success else 409
+
+
 # @ns.route('/nodo/id/<string:id_nodo>/desactivado')
 # class SRNodeAPIDeactivated(Resource):
 #
