@@ -36,31 +36,31 @@ class SRReportAPI(Resource):
         pass
 
 
-@ns.route('/nodo/id/<string:id_nodo>/activado')
-class SRNodeAPIActivated(Resource):
+@ns.route('/prueba/<string:user_group>')
+class PruebaReport(Resource):
 
-    def put(self, id_nodo: str = "ID del nodo a cambiar"):
+    def post(self, user_group: str = "Grupo de usuarios"):
         """
-        Activa el nodo
-        """
-        pass
-
-@ns.route('/nodo/id/<string:id_nodo>/desactivado')
-class SRNodeAPIDeactivated(Resource):
-
-    def put(self, id_nodo: str = "ID del nodo a cambiar"):
-        """
-        Desactiva el nodo
+        Mail de prueba
         """
         pass
-
-
-@ns.route('/nodo/<string:tipo>/<string:nombre>/<string:entidad_tipo>/<string:entidad_nombre>')
-class SREntidadAPI(Resource):
-    def get(self, tipo: str = "Tipo nodo", nombre: str = "Nombre nodo", entidad_tipo: str = "Entidad tipo",
-            entidad_nombre: str = "Entidad nombre"):
-        """ Retorna las entidades de un nodo """
-        pass
+#
+# @ns.route('/nodo/id/<string:id_nodo>/desactivado')
+# class SRNodeAPIDeactivated(Resource):
+#
+#     def put(self, id_nodo: str = "ID del nodo a cambiar"):
+#         """
+#         Desactiva el nodo
+#         """
+#         pass
+#
+#
+# @ns.route('/nodo/<string:tipo>/<string:nombre>/<string:entidad_tipo>/<string:entidad_nombre>')
+# class SREntidadAPI(Resource):
+#     def get(self, tipo: str = "Tipo nodo", nombre: str = "Nombre nodo", entidad_tipo: str = "Entidad tipo",
+#             entidad_nombre: str = "Entidad nombre"):
+#         """ Retorna las entidades de un nodo """
+#         pass
 
 #
 # @ns.route('/rtu/<string:id_nodo>/<string:id_entidad>')
