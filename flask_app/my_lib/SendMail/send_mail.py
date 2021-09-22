@@ -12,7 +12,6 @@ from email.mime.image import MIMEImage
 import codecs
 
 script_path = os.path.dirname(os.path.abspath(__file__))
-im_path = init.REPORTS_REPO
 template_path = os.path.join(init.TEMPLATES_REPO, "templates")
 html_error_template_path = os.path.join(template_path, "reportar_error.html")
 log_path = os.path.join(init.project_path, "logs")
@@ -35,7 +34,7 @@ def report_error(descripcion: str, detalle: str, from_email: str, emails, log_fi
         log.error(msg)
 
 
-def send_mail(msg_to_send: str, subject, recipients: list, from_email, image_list: list = None, files=None):
+def send_mail(msg_to_send: str, subject, recipients: list, from_email, image_list: list = None, files=None,im_path=None):
     from email.mime.multipart import MIMEMultipart
     from email.mime.application import MIMEApplication
     from email.mime.text import MIMEText

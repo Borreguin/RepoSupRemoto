@@ -17,6 +17,7 @@ import re
 import traceback
 import installer as ins
 import matplotlib.colors as colors
+import shutil
 
 # Librería de conexión con Pi-Server, # librería para envíar mail de supervisión
 from flask_app.my_lib.PI_connection import pi_connect as p
@@ -66,14 +67,20 @@ criticidad_value = [0, 1, 0.67, 0.33, 0]
 script_path = os.path.dirname(os.path.abspath(__file__))
 html_template = os.path.join(init.TEMPLATES_REPO, "supervision_sist_remoto.html")
 reporte_path = os.path.join(init.project_path, "reportes")
-images_path = init.IMAGES_REPO
+
 yyyy_mm_dd_hh_mm_ss = "%d-%m-%Y %H:%M:%S"
 fmt_dd_mm_yyyy_hh_mm = "dd/MMM/yy HH:mm"
 fmt_dd_mm_yy_ = "dd_MMM_yyyy"
+fmt_yyyy="yyyy"
+fmt_mm="MMM"
+fmt_dd="dd"
+
+
+
 time_range = None
 
 
-def process_html_file(df, df_filter, df_indisp, df_hist=None,time_range=None):
+def process_html_file(df, df_filter, df_indisp, df_hist=None,time_range=None,images_path = None):
     # realizando las sustituciones necesarias para llenar el formulario HTML:
     html_str = codecs.open(html_template, 'r', 'utf-8').read()
     fecha = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -150,9 +157,7 @@ def process_html_file(df, df_filter, df_indisp, df_hist=None,time_range=None):
             df_h = pt.interpolated(week_time_range, span=_span("1h"), numeric=False)
             df_h[tag_name] = [str(x) for x in df_h[tag_name]]
             # creando las barras de estados:
-            #crear carpetas años
-
-            im_name = "rep_utr_" + name + "_" + time_range.EndTime.ToString(fmt_dd_mm_yy_)
+            im_name = "rep_utr_" + name + "_" + time_range.EndTime.ToString(fmt_dd)
             image_p = os.path.join(images_path, im_name + ".png")
             image_p_relative = "./images/" + im_name + ".png"
             _, color_map = u.get_state_colors(excel_path=excel_file, sheet_name=ColorSheet)
@@ -263,10 +268,23 @@ def run_process_for(time_range_to_run,recipients,from_email):
     df_filter = df[df[lb_tiempo_disponible] <= (24*60-3.6*60)].copy()
 
     # llenando el template con datos
-    str_html = process_html_file(df, df_filter, df_indisp, df_hist,time_range_to_run)
-
+    #crear carpetas años
+    path_year=os.path.join(init.REPORTS_REPO,time_range_to_run.EndTime.ToString(fmt_yyyy))
+    path_month = os.path.join(path_year, time_range_to_run.EndTime.ToString(fmt_mm))
+    image_path = os.path.join(path_month, "images")
+    cenace_path=os.path.join(init.TEMPLATES_REPO,"images","cenace.jpg")
+    cenace_cpy=os.path.join(image_path,"cenace.jpg")
+    if not os.path.exists(path_year):
+        os.makedirs(path_year)
+    if not os.path.exists(path_month):
+        os.makedirs(path_month)
+    if not os.path.exists(image_path):
+        os.makedirs(image_path)
+    if not os.path.exists(cenace_cpy):
+        shutil.copy(cenace_path,cenace_cpy)
+    str_html = process_html_file(df, df_filter, df_indisp, df_hist,time_range_to_run,image_path)
     # guardando el reporte en la carpeta reportes
-    reporte_path = os.path.join(reporte_path, f"sistema_remoto_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")
+    reporte_path = os.path.join(path_month, f"sistema_remoto_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")
     u.save_html(str_html, reporte_path)
 
     # encontrando imágenes en el archivo html para anexarlas
@@ -276,7 +294,7 @@ def run_process_for(time_range_to_run,recipients,from_email):
     image_list = [im[0].replace('"', '') for im in image_list]
 
     send.send_mail(str_html, "Supervisión Sistema Remoto " + dt.datetime.now().strftime("%d/%m/%Y"),
-                   recipients, from_email, image_list)
+                   recipients, from_email, image_list,im_path=path_month)
     return True, f"[{dt.datetime.now()}]El reporte de sistema remoto ha sido enviado existosamente a: {recipients}"
 
 
