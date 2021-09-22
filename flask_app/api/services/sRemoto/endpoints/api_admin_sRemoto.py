@@ -94,6 +94,12 @@ class ConfigUTR(Resource):
         """
         pass
 
+    def get(self):
+        """
+        Obtener configuracion actual
+        """
+        pass
+
 @ns.route('/users')
 class Users(Resource):
 
