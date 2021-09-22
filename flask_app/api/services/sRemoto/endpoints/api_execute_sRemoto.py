@@ -12,21 +12,18 @@
 import datetime as dt
 from flask_app.api.services.sRemoto.endpoints import *
 from flask_restplus import Resource
-from flask import request, send_from_directory
-import re
 # importando configuraciones iniciales
 from flask_app.my_lib import utils
-from flask_app.my_lib.PI_connection.pi_connect import _time_range
 from flask_app.my_lib.SendMail.send_mail import send_mail
 from flask_app.my_lib.Sistema_Remoto.sRemoto import run_process_for
 from flask_app.api.services.restplus_config import api
 from flask_app.api.services.sRemoto import serializers as srl
-from flask_app.api.services.sRemoto import parsers
+
 # importando clases para leer desde MongoDB
-from random import randint
+
 
 # configurando logger y el servicio web, para ejecutar Reporte de Sistema Remoto
-
+#ENVIO AUTOMATICO DE REPORTE
 
 ns = api.namespace('exec-sRemoto', description='Ejecutar reporte de Sistema Remoto')
 
@@ -73,67 +70,5 @@ class PruebaReport(Resource):
         users=list(df_filter["Correo"])
         success,msg=send_mail("Esta es una prueba","TEST",users,init.EMAIL_SREMOTO)
         return dict(success=success,msg=msg),200 if success else 409
-
-
-# @ns.route('/nodo/id/<string:id_nodo>/desactivado')
-# class SRNodeAPIDeactivated(Resource):
-#
-#     def put(self, id_nodo: str = "ID del nodo a cambiar"):
-#         """
-#         Desactiva el nodo
-#         """
-#         pass
-#
-#
-# @ns.route('/nodo/<string:tipo>/<string:nombre>/<string:entidad_tipo>/<string:entidad_nombre>')
-# class SREntidadAPI(Resource):
-#     def get(self, tipo: str = "Tipo nodo", nombre: str = "Nombre nodo", entidad_tipo: str = "Entidad tipo",
-#             entidad_nombre: str = "Entidad nombre"):
-#         """ Retorna las entidades de un nodo """
-#         pass
-
-#
-# @ns.route('/rtu/<string:id_nodo>/<string:id_entidad>')
-# class SRRTUSAPI(Resource):
-#
-#     def get(self, id_nodo: str = "id nodo", id_entidad: str = "id entidad"):
-#         """ Regresa la lista de RTU de una entidad
-#             Id nodo: id único del nodo
-#             Id entidad: id único de la entidad
-#             <b>404</b> Si el nodo o la entidad no existe
-#         """
-#         pass
-#
-#     @api.expect(ser_from.rtu)
-#     def post(self, id_nodo: str = "id nodo", id_entidad: str = "id entidad"):
-#         """ Ingresa una nueva RTU en una entidad si esta no existe, caso contrario la edita
-#             Id nodo: id único del nodo
-#             Id entidad: id único de la entidad
-#             <b>404</b> Si el nodo o la entidad no existe
-#         """
-#         pass
-#
-#     @api.expect(ser_from.rtu_id)
-#     def delete(self, id_nodo: str = "id nodo", id_entidad: str = "id entidad"):
-#         """ Elimina una RTU en una entidad
-#             Id nodo: id único del nodo
-#             Id entidad: id único de la entidad
-#             <b>404</b> Si el nodo o la entidad no existe
-#         """
-#         pass
-#
-#
-# @ns.route('/rtu/<string:id_nodo>/<string:id_entidad>/<string:id_utr>')
-# class SRRTUAPI(Resource):
-#
-#     @staticmethod
-#     def get(id_nodo: str = "id nodo", id_entidad: str = "id entidad", id_utr: str = "id UTR"):
-#         """ Regresa la cofiguración de la RTU
-#             Id nodo: id único del nodo
-#             Id entidad: id único de la entidad
-#             Id utr: id único de la entidad
-#             <b>404</b> Si el nodo, la entidad o UTR no existe
-#         """
-#         pass
 
 
