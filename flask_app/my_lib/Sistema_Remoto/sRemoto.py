@@ -23,10 +23,10 @@ from flask_app.my_lib.PI_connection import pi_connect as p
 from flask_app.my_lib.PI_connection.pi_connect import _time_range, _span
 from flask_app.my_lib.SendMail import send_mail as send
 from flask_app.my_lib import utils as u
-
+from flask_app.settings import initial_settings as init
 """ Variables globales """
 pi_svr = p.PIserver()
-excel_file = "Config.xlsx"
+excel_file = os.path.join(init.SREMOTO_REPO, "Config.xlsx")
 # etiquetas de la hoja Config
 lb_tag = "Tag"
 lb_name = "Nombre"
@@ -64,18 +64,16 @@ criticidad_value = [0, 1, 0.67, 0.33, 0]
 
 """ Configuraciones del script """
 script_path = os.path.dirname(os.path.abspath(__file__))
-html_template = os.path.join(script_path, "templates", "supervision_sist_remoto.html")
-reporte_path = os.path.join(script_path, "reportes")
-images_path = os.path.join(reporte_path, "images")
+html_template = os.path.join(init.TEMPLATES_REPO, "supervision_sist_remoto.html")
+reporte_path = os.path.join(init.project_path, "reportes")
+images_path = init.IMAGES_REPO
 yyyy_mm_dd_hh_mm_ss = "%d-%m-%Y %H:%M:%S"
 fmt_dd_mm_yyyy_hh_mm = "dd/MMM/yy HH:mm"
-fmt_dd_mm_yy_ = "dd/MMM/yyyy"
+fmt_dd_mm_yy_ = "dd_MMM_yyyy"
 time_range = None
 
 
-def process_html_file(df, df_filter, df_indisp, df_hist=None):
-    global reporte_path
-    global time_range
+def process_html_file(df, df_filter, df_indisp, df_hist=None,time_range=None):
     # realizando las sustituciones necesarias para llenar el formulario HTML:
     html_str = codecs.open(html_template, 'r', 'utf-8').read()
     fecha = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -148,10 +146,12 @@ def process_html_file(df, df_filter, df_indisp, df_hist=None):
             porcentaje_disponibilidad = df_hist[lb_tiempo_disponible].loc[ix]/minutos_semana
             pt = p.PI_point(pi_svr, tag_name)
             str_week_time = str(df_hist[lb_period].loc[ix]).split("-")
-            week_time_range = pi_svr.time_range(str_week_time[0], str_week_time[1])
-            df_h = pt.interpolated(week_time_range, span=pi_svr.span("1h"), numeric=False)
+            week_time_range = _time_range(str_week_time[0], str_week_time[1])
+            df_h = pt.interpolated(week_time_range, span=_span("1h"), numeric=False)
             df_h[tag_name] = [str(x) for x in df_h[tag_name]]
             # creando las barras de estados:
+            #crear carpetas años
+
             im_name = "rep_utr_" + name + "_" + time_range.EndTime.ToString(fmt_dd_mm_yy_)
             image_p = os.path.join(images_path, im_name + ".png")
             image_p_relative = "./images/" + im_name + ".png"
@@ -237,7 +237,7 @@ def run_process_for(time_range_to_run,recipients,from_email):
     global reporte_path
     # definiendo tiempo del reporte:
     ini_date,end_date = time_range_to_run
-    time_range=_time_range(ini_date,end_date)
+    time_range_to_run=_time_range(ini_date,end_date)
     # definiendo tiempo del reporte una semana atrás:
     week_time_range = u.define_time_range_for_this_week(end_date)
 
@@ -263,7 +263,7 @@ def run_process_for(time_range_to_run,recipients,from_email):
     df_filter = df[df[lb_tiempo_disponible] <= (24*60-3.6*60)].copy()
 
     # llenando el template con datos
-    str_html = process_html_file(df, df_filter, df_indisp, df_hist)
+    str_html = process_html_file(df, df_filter, df_indisp, df_hist,time_range_to_run)
 
     # guardando el reporte en la carpeta reportes
     reporte_path = os.path.join(reporte_path, f"sistema_remoto_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")
