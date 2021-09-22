@@ -9,13 +9,16 @@
     "My work is well done to honor God at any time" R Sanchez A.
     Mateo 6:33
 """
+import datetime as dt
 from flask_app.api.services.sRemoto.endpoints import *
 from flask_restplus import Resource
 from flask import request, send_from_directory
 import re
 # importando configuraciones iniciales
+from flask_app.my_lib import utils
+from flask_app.my_lib.PI_connection.pi_connect import _time_range
 from flask_app.my_lib.SendMail.send_mail import send_mail
-from flask_app.my_lib.utils import set_max_age_to_response
+from flask_app.my_lib.Sistema_Remoto.sRemoto import run_process_for
 from flask_app.api.services.restplus_config import api
 from flask_app.api.services.sRemoto import serializers as srl
 from flask_app.api.services.sRemoto import parsers
@@ -23,18 +26,36 @@ from flask_app.api.services.sRemoto import parsers
 from random import randint
 
 # configurando logger y el servicio web, para ejecutar Reporte de Sistema Remoto
+
+
 ns = api.namespace('exec-sRemoto', description='Ejecutar reporte de Sistema Remoto')
 
 ser_from = srl.sRemotoSerializers(api)
 api = ser_from.add_serializers()
 
+
 @ns.route('/ejecutar')
-@ns.route('/ejecutar/<string:fecha_inicio>/<string:fecha_fin>')
+@ns.route('/ejecutar/<string:grupo>/<string:fecha_reporte>')
 class SRReportAPI(Resource):
 
-    def post(self, fecha_inicio: str = "fecha_inicio", fecha_fin: str = "fecha_fin"):
-        """ Ejecuta el reporte de sistema remoto """
-        pass
+    def post(self, grupo: str = None, fecha_reporte: str = None):
+        """ Ejecutar el reporte de sistema remoto para un especificado grupo """
+        if fecha_reporte is None:
+            fecha_reporte=dt.datetime.now()
+        else:
+            fecha_reporte=utils.valid_date(fecha_reporte)
+        ini_time = fecha_reporte - dt.timedelta(days=1)
+        if grupo is None:
+            grupo="User"
+        user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
+        df_user = pd.read_excel(user_config_path, index_col="ID")
+        mask = df_user["Grupo"] == grupo
+        df_filter = df_user[mask]
+        recipients = list(df_filter["Correo"])
+        from_email=init.EMAIL_SREMOTO
+        time_range_to_run=(ini_time, fecha_reporte)
+        success,msg=run_process_for(time_range_to_run, recipients, from_email)
+        return dict(success=success,msg=msg), 200 if success else 409
 
 
 @ns.route('/prueba/<string:user_group>')

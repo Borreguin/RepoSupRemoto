@@ -16,7 +16,6 @@ from flask_restplus import Resource
 from flask import request, send_from_directory
 import re
 # importando configuraciones iniciales
-from flask_app.my_lib.utils import set_max_age_to_response
 from flask_app.api.services.restplus_config import api
 from flask_app.api.services.sRemoto import serializers as srl
 from flask_app.api.services.sRemoto import parsers

@@ -36,6 +36,10 @@ def define_time_range_for_yesterday():
     time_range = pi_svr.time_range(ytd, tdy)
     return time_range
 
+def define_time_range_for_date(date:dt.datetime):
+    ytd = date - dt.timedelta(days=1)
+    time_range = pi_svr.time_range(ytd, date)
+    return time_range
 
 def define_time_range_for_last_week():
     tdy = dt.datetime.now().strftime(yyyy_mm_dd_hh_mm_ss)
