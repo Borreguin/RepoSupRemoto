@@ -1,0 +1,7 @@
+/.idea/
+/_db
+/temp
+/logs
+/flask_app/settings/dev.py
+/flask_app/settings/prod.py
+/reportes
