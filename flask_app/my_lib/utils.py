@@ -82,7 +82,7 @@ def define_time_range_for_yesterday():
 def define_time_range_for_this_week(tdy=None):
     if tdy is None:
         tdy = dt.datetime.now().strftime(yyyy_mm_dd_hh_mm_ss)
-    wkt = dt.datetime.now() - dt.timedelta(days=7)
+    wkt = tdy - dt.timedelta(days=7)
     time_range =_time_range(wkt, tdy)
     return time_range
 
@@ -140,7 +140,7 @@ def process_avalability_from_excel_file(excel_file, sheet_name, time_range_to_ru
                                         span=_span("1d"), time_unit="mi"):
 
     # leyendo archivo Excel y filtrando aquellos que están activos:
-    df = pd.read_excel(excel_file, sheet_name=sheet_name)
+    df = pd.read_excel(excel_file, sheet_name=sheet_name, engine='openpyxl')
     df = df[df["Activa"] == "x"]
     df[lb_tiempo] = [0 for ix in df.index]  # iniciando la columna lb_tiempo con 0
     df[lb_state] = ["" for ix in df.index]  # iniciando la columna lb_state con vacío
@@ -168,7 +168,7 @@ def process_avalability_from_excel_file(excel_file, sheet_name, time_range_to_ru
 def get_state_colors(excel_path:str, sheet_name:str):
     columns = ["ESTADO", "COLOR"]
     try:
-        df = pd.read_excel(excel_path, sheet_name)
+        df = pd.read_excel(excel_path, sheet_name, engine='openpyxl')
         df = df[columns]
         color_dict = dict()
         for ste, sus in zip(list(df["ESTADO"]), list(df["COLOR"])):

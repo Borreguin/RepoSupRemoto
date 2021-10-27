@@ -36,16 +36,19 @@ api = ser_from.add_serializers()
 class SRReportAPI(Resource):
 
     def post(self, grupo: str = None, fecha_reporte: str = None):
-        """ Ejecutar el reporte de sistema remoto para un especificado grupo """
+        """ Ejecutar el reporte de sistema remoto para un especificado grupo
+            El grupo por defecto a enviar el mensaje es User
+            Formato Fecha: yyyy-mm-dd hh:MM:ss
+        """
         if fecha_reporte is None:
             fecha_reporte=dt.datetime.now()
         else:
-            fecha_reporte=utils.valid_date(fecha_reporte)
+            fecha_reporte=utils.valid_date_h_m_s(fecha_reporte)
         ini_time = fecha_reporte - dt.timedelta(days=1)
         if grupo is None:
             grupo="User"
         user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
         mask = df_user["Grupo"] == grupo
         df_filter = df_user[mask]
         recipients = list(df_filter["Correo"])
@@ -64,7 +67,7 @@ class PruebaReport(Resource):
         """
         # leer archivo de excel con path
         user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
         mask=df_user["Grupo"]==user_group
         df_filter=df_user[mask]
         users=list(df_filter["Correo"])

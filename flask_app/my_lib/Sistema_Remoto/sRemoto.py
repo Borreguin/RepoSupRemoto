@@ -83,7 +83,7 @@ time_range = None
 def process_html_file(df, df_filter, df_indisp, df_hist=None,time_range=None,images_path = None):
     # realizando las sustituciones necesarias para llenar el formulario HTML:
     html_str = codecs.open(html_template, 'r', 'utf-8').read()
-    fecha = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    fecha = time_range.EndTime.ToString(fmt_dd_mm_yyyy_hh_mm)
     html_str = html_str.replace("(#dd/mm/yyyy)", fecha)
     html_str = html_str.replace("(#no_UTR)", str(len(df.index)))
     html_str = html_str.replace("(#no_UTR_indisponible)", str(len(df_indisp)))
@@ -282,7 +282,8 @@ def run_process_for(time_range_to_run,recipients,from_email):
         os.makedirs(image_path)
     if not os.path.exists(cenace_cpy):
         shutil.copy(cenace_path,cenace_cpy)
-    str_html = process_html_file(df, df_filter, df_indisp, df_hist,time_range_to_run,image_path)
+    # archivo procesado como una cadena de caracteres:
+    str_html = process_html_file(df, df_filter, df_indisp, df_hist, time_range_to_run,image_path)
     # guardando el reporte en la carpeta reportes
     reporte_path = os.path.join(path_month, f"sistema_remoto_{time_range_to_run.EndTime.ToString(fmt_dd_mm_yy_)}.html")
     u.save_html(str_html, reporte_path)
@@ -293,7 +294,7 @@ def run_process_for(time_range_to_run,recipients,from_email):
     image_list = re.findall(regex, str_html)
     image_list = [im[0].replace('"', '') for im in image_list]
 
-    send.send_mail(str_html, "Supervisión Sistema Remoto " + dt.datetime.now().strftime("%d/%m/%Y"),
+    send.send_mail(str_html, "Supervisión Sistema Remoto " + end_date.strftime("%d/%m/%Y"),
                    recipients, from_email, image_list,im_path=path_month)
     return True, f"[{dt.datetime.now()}]El reporte de sistema remoto ha sido enviado existosamente a: {recipients}"
 

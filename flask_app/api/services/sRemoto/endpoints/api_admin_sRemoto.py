@@ -11,6 +11,8 @@
 """
 import uuid
 
+import pandas as pd
+
 from flask_app.api.services.sRemoto.endpoints import *
 from flask_restplus import Resource
 from flask import request, send_from_directory
@@ -21,7 +23,6 @@ from flask_app.api.services.sRemoto import serializers as srl
 from flask_app.api.services.sRemoto import parsers
 # importando clases para leer desde MongoDB
 from random import randint
-
 
 # configurando logger y el servicio web, para administrar Reporte de Sistema Remoto
 ns = api.namespace('admin-sRemoto', description='Administración de reporte de Sistema Remoto')
@@ -36,34 +37,43 @@ class ReportUser(Resource):
     def post(self, grupo: str = "Grupo de Usuario", nombre: str = "Nombre del usuario", correo_electronico: str =
     "Correo electronico"):
         """Crea un usuario de reporte """
-        #leer archivo de excel con path
-        user_config_path=os.path.join(init.SREMOTO_REPO,"users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
+        # leer archivo de excel con path
+        user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
         id = uuid.uuid4()
-        user=dict(ID=id,Grupo=grupo,Usuario=nombre,Correo=correo_electronico,Activado=True)
-        df_user=df_user.append(user,ignore_index=True)
-        df_user.set_index(keys=["ID"],inplace=True)
+        if not os.path.exists(user_config_path):
+            user = dict(ID=id, Grupo=grupo, Usuario=nombre, Correo=correo_electronico, Activado=True)
+            df = pd.DataFrame(data=[user])
+            df.set_index(keys=["ID"], inplace=True)
+            df.to_excel(user_config_path)
+            return dict(success=True, msg="Archivo inicial creado y usuario creado")
+        df_user = pd.read_excel(user_config_path, engine='openpyxl')
+        user = dict(ID=id, Grupo=grupo, Usuario=nombre, Correo=correo_electronico, Activado=True)
+        df_user = df_user.append(user, ignore_index=True)
+        df_user.set_index(keys=["ID"], inplace=True)
         df_user.to_excel(user_config_path)
-        return dict(success=True,msg="Usuario Creado")
+        return dict(success=True, msg="Usuario Creado")
+
 
 @ns.route('/user/<string:id>/<string:grupo>/<string:nombre>/<string:correo_electronico>')
 class ReportUserEdit(Resource):
 
-    def put(self,id:str="ID", grupo: str = "Grupo de Usuario", nombre: str = "Nombre del usuario", correo_electronico: str=
+    def put(self, id: str = "ID", grupo: str = "Grupo de Usuario", nombre: str = "Nombre del usuario",
+            correo_electronico: str =
             "Correo electronico"):
         """Edita un usuario de reporte por ID """
         # leer archivo de excel con path
         user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
-        df_user = pd.read_excel(user_config_path,index_col="ID")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
         if not id in df_user.index:
-            return dict(success=False,msg="Usuario no encontrado"),404
-        user=df_user.loc[id]
-        user["Grupo"]=grupo
+            return dict(success=False, msg="Usuario no encontrado"), 404
+        user = df_user.loc[id]
+        user["Grupo"] = grupo
         user["Usuario"] = nombre
         user["Correo"] = correo_electronico
-        df_user.loc[id]=user
+        df_user.loc[id] = user
         df_user.to_excel(user_config_path)
         return dict(success=True, msg="Usuario Editado")
+
 
 @ns.route('/user/<string:id>')
 class ReportUserDelete(Resource):
@@ -72,12 +82,13 @@ class ReportUserDelete(Resource):
         """Borra un usuario de reporte """
         # leer archivo de excel con path
         user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
         if not id in df_user.index:
             return dict(success=False, msg="Usuario no encontrado"), 404
-        df_user.drop(index=id,axis="index",inplace=True)
+        df_user.drop(index=id, axis="index", inplace=True)
         df_user.to_excel(user_config_path)
         return dict(success=True, msg="Usuario Editado")
+
 
 @ns.route('/config-utr-excel')
 class ConfigUTR(Resource):
@@ -100,6 +111,7 @@ class ConfigUTR(Resource):
         """
         pass
 
+
 @ns.route('/users')
 class Users(Resource):
 
@@ -107,11 +119,12 @@ class Users(Resource):
         """
         Obtiene los usuarios
         """
-        #leer archivo de excel con path
-        user_config_path=os.path.join(init.SREMOTO_REPO,"users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
-        users=df_user.to_dict(orient="records")
-        return dict(success=True,msg="Usuarios encontrados",users=users)
+        # leer archivo de excel con path
+        user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
+        users = df_user.to_dict(orient="records")
+        return dict(success=True, msg="Usuarios encontrados", users=users)
+
 
 @ns.route('/user/<string:id>/active')
 class ActiveUser(Resource):
@@ -120,7 +133,7 @@ class ActiveUser(Resource):
         """Activa usuario"""
         # leer archivo de excel con path
         user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
         if not id in df_user.index:
             return dict(success=False, msg="Usuario no encontrado"), 404
         user = df_user.loc[id]
@@ -129,6 +142,7 @@ class ActiveUser(Resource):
         df_user.to_excel(user_config_path)
         return dict(success=True, msg="Usuario Activado")
 
+
 @ns.route('/user/<string:id>/desactive')
 class ActiveUser(Resource):
 
@@ -136,7 +150,7 @@ class ActiveUser(Resource):
         """Desactiva usuario"""
         # leer archivo de excel con path
         user_config_path = os.path.join(init.SREMOTO_REPO, "users.xlsx")
-        df_user = pd.read_excel(user_config_path, index_col="ID")
+        df_user = pd.read_excel(user_config_path, index_col="ID", engine='openpyxl')
         if not id in df_user.index:
             return dict(success=False, msg="Usuario no encontrado"), 404
         user = df_user.loc[id]
@@ -205,5 +219,3 @@ class ActiveUser(Resource):
 #             <b>404</b> Si el nodo, la entidad o UTR no existe
 #         """
 #         pass
-
-
