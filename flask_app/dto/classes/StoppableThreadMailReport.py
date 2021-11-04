@@ -10,7 +10,7 @@ import time
 import traceback
 from mongoengine import connect
 
-import flask_app.settings.LogDeafultConfig
+import flask_app.settings.LogDefaultConfig
 from flask_app.dto.classes.utils import get_today, get_thread_by_name
 from flask_app.dto.mongo_engine_handler.ProcessingState import TemporalProcessingStateReport
 from flask_app.dto.mongo_engine_handler.SRFinalReport.sRFinalReportBase import lb_unidad_negocio, lb_empresa, \
@@ -41,7 +41,7 @@ url_disponibilidad_json = f"{url_disponibilidad_base}/json"
 url_disponibilidad_excel = f"{url_disponibilidad_base}/excel"
 
 # LOGS:
-log = flask_app.settings.LogDeafultConfig.LogDefaultConfig("StoppableThreadMailReport.log").logger
+log = flask_app.settings.LogDefaultConfig.LogDefaultConfig("StoppableThreadMailReport.log").logger
 lb_indisponible_minutes = "indisponible_minutos"
 lb_disponibilidad = "disponibilidad"
 lb_indisponible_acumulado_minutos = "indisponibilidad_acumulado_minutos"

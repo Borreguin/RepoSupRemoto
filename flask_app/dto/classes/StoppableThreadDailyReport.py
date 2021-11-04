@@ -7,7 +7,7 @@ import datetime as dt
 import traceback
 from mongoengine import connect
 
-import flask_app.settings.LogDeafultConfig
+import flask_app.settings.LogDefaultConfig
 from flask_app.dto.classes.utils import get_today, get_thread_by_name
 from flask_app.dto.mongo_engine_handler.ProcessingState import TemporalProcessingStateReport
 from flask_app.settings import initial_settings as init
@@ -17,7 +17,7 @@ import requests
 host = "localhost"
 url_disponibilidad_diaria = f"http://{host}:{init.API_PORT}{init.API_PREFIX}/admin-report/run/reporte/diario"
 url_disponibilidad_mes = f"http://{host}:{init.API_PORT}{init.API_PREFIX}/disp-sRemoto/disponibilidad/ini_date/end_date"
-log = flask_app.settings.LogDeafultConfig.LogDefaultConfig("StoppableThreadDailyReport.log").logger
+log = flask_app.settings.LogDefaultConfig.LogDefaultConfig("StoppableThreadDailyReport.log").logger
 
 
 class StoppableThreadDailyReport(threading.Thread):
